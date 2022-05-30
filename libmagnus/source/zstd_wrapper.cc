@@ -20,6 +20,19 @@ void ZSTD::compress_single(std::string_view& input)
     _buffer->resize(c_size);
 }
 
+void ZSTD::decompress_single(std::string_view& input)
+{
+    unsigned long long const rSize = ZSTD_getFrameContentSize(input.data(), input.size());
+    CHECK(rSize != ZSTD_CONTENTSIZE_ERROR, "%s: not compressed by zstd!");
+    CHECK(rSize != ZSTD_CONTENTSIZE_UNKNOWN, "%s: original size unknown!");
+
+    _buffer->resize(size_t(rSize));
+    size_t const dSize = ZSTD_decompress(_buffer->data(), rSize, input.data(), input.size());
+    CHECK_ZSTD(dSize);
+    // When zstd knows the content size, it will error if it doesn't match.
+    CHECK(dSize == rSize, "Size does not match!");
+}
+
 std::string_view ZSTD::get_string_view()
 {
     if (!_buffer) {

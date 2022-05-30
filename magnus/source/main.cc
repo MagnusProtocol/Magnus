@@ -27,11 +27,24 @@ int main()
     if (packet_size == size)
         std::cout << "Yes" << std::endl;
 
-    std::ofstream stream("hurt.flac.zst", std::ios::out | std::ios::binary);
-
+    // Compression
+    std::ofstream stream_compression("compressed.jpg.zst", std::ios::out | std::ios::binary);
     auto zstd_compressor = ZSTD();
-    zstd_compressor.compress(data);
-    stream.write(
+
+    zstd_compressor.compress_single(data);
+
+    stream_compression.write(
         zstd_compressor.get_string()->data(),
         zstd_compressor.get_string()->size());
+
+    // Decompression
+    std::ofstream stream_decompression("decompressed.jpg", std::ios::out | std::ios::binary);
+    auto zstd_decompressor = ZSTD();
+
+    auto compressed_string = zstd_compressor.get_string_view();
+    zstd_decompressor.decompress_single(compressed_string);
+
+    stream_decompression.write(
+        zstd_decompressor.get_string()->data(),
+        zstd_decompressor.get_string()->size());
 }

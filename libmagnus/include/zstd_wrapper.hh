@@ -29,7 +29,10 @@ public:
     ZSTD();
     ~ZSTD();
 
-    void compress(std::string_view& input);
+    void compress_single(std::string_view& input);
+
+    void decompress_single(std::string_view& input);
+
     std::string_view get_string_view();
     std::string* get_string();
 };
