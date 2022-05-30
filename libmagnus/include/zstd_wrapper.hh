@@ -24,14 +24,19 @@
 class ZSTD {
 private:
     std::string* _buffer;
+    std::string_view _input;
+    // Compression context
+    ZSTD_CCtx* _cctx;
+    // Decompression context
+    ZSTD_DCtx* _dctx;
 
 public:
-    ZSTD();
+    ZSTD(std::string_view& input);
     ~ZSTD();
 
-    void compress_single(std::string_view& input);
+    void compress();
 
-    void decompress_single(std::string_view& input);
+    void decompress();
 
     std::string_view get_string_view();
     std::string* get_string();

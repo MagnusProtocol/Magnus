@@ -8,7 +8,7 @@
 
 int main()
 {
-    LibMagnus::Magnus new_magnus("/home/steve/Pictures/Wallpapers/Grass.jpg");
+    LibMagnus::Magnus new_magnus("/home/steve/Games/DOOM_ETERNAL/UP1003-CUSA13338_00-DOOM050000000000-A0100-V0100.part05.rar");
     auto data = new_magnus.get_data();
 
     size_t size = data.size();
@@ -29,9 +29,9 @@ int main()
 
     // Compression
     std::ofstream stream_compression("compressed.jpg.zst", std::ios::out | std::ios::binary);
-    auto zstd_compressor = ZSTD();
+    auto zstd_compressor = ZSTD(data);
 
-    zstd_compressor.compress_single(data);
+    zstd_compressor.compress();
 
     stream_compression.write(
         zstd_compressor.get_string()->data(),
@@ -39,10 +39,11 @@ int main()
 
     // Decompression
     std::ofstream stream_decompression("decompressed.jpg", std::ios::out | std::ios::binary);
-    auto zstd_decompressor = ZSTD();
 
     auto compressed_string = zstd_compressor.get_string_view();
-    zstd_decompressor.decompress_single(compressed_string);
+    auto zstd_decompressor = ZSTD(compressed_string);
+
+    zstd_decompressor.decompress();
 
     stream_decompression.write(
         zstd_decompressor.get_string()->data(),

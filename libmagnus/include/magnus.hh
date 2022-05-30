@@ -17,5 +17,6 @@ public:
     Magnus(std::string filepath);
     ~Magnus();
     std::string_view get_data();
+    void write_data(std::string filename);
 };
 }

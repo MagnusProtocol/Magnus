@@ -11,20 +11,6 @@
 
 namespace LibMagnus {
 
-void Magnus::map_file()
-{
-    // Get file length
-    struct stat sb;
-    if (fstat(_fd, &sb) == -1)
-        std::cerr << "[ERROR]: Could not fstat" << std::endl;
-
-    _length = sb.st_size;
-
-    _addr = mmap(NULL, _length, PROT_READ, MAP_PRIVATE, _fd, 0u);
-    if (_addr == MAP_FAILED)
-        std::cerr << "[ERROR]: Could not mmap" << std::endl;
-}
-
 Magnus::Magnus(std::string filepath)
 {
     // Check if the file exists
@@ -48,6 +34,20 @@ Magnus::~Magnus()
 {
     munmap((void*)_addr, _length);
     close(_fd);
+}
+
+void Magnus::map_file()
+{
+    // Get file length
+    struct stat sb;
+    if (fstat(_fd, &sb) == -1)
+        std::cerr << "[ERROR]: Could not fstat" << std::endl;
+
+    _length = sb.st_size;
+
+    _addr = mmap(NULL, _length, PROT_READ, MAP_PRIVATE, _fd, 0u);
+    if (_addr == MAP_FAILED)
+        std::cerr << "[ERROR]: Could not mmap" << std::endl;
 }
 
 std::string_view Magnus::get_data()
