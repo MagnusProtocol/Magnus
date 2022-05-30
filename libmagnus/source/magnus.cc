@@ -30,7 +30,7 @@ Magnus::Magnus(std::string filepath)
     // Check if the file exists
     if (!std::filesystem::exists(filepath)) {
         std::cerr << "[ERROR]: File does not exist." << std::endl;
-        }
+    }
 
     // Open the file, UNIX style
     _fd = open(filepath.c_str(), O_RDONLY);

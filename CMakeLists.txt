@@ -14,10 +14,18 @@ file(GLOB MAGNUS_SOURCES
 file(GLOB LIBMAGNUS_SOURCES
     libmagnus/source/*.cc
 )
+# Don't build the zstd static libs
+set(ZSTD_BUILD_STATIC OFF)
+# Don't build the zstd cli
+set(ZSTD_BUILD_PROGRAMS OFF)
+# For zstd
+add_subdirectory(deps/zstd/build/cmake)
 
 # Libmagnus (backend/protocol)
 add_library(libmagnus ${LIBMAGNUS_SOURCES})
 target_include_directories(libmagnus PUBLIC libmagnus/include)
+target_link_libraries(libmagnus PUBLIC libzstd_shared)
+
 
 # Magnus (frontend/cli)
 add_executable(magnus ${MAGNUS_SOURCES})

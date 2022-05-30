@@ -4,10 +4,11 @@
 #include "sys/sysinfo.h"
 #include "sys/types.h"
 #include <iostream>
+#include <zstd_wrapper.hh>
 
 int main()
 {
-    LibMagnus::Magnus new_magnus("/home/steve/Games/DOOM_ETERNAL/UP1003-CUSA13338_00-DOOM050000000000-A0100-V0100.pkg");
+    LibMagnus::Magnus new_magnus("/home/steve/Pictures/Wallpapers/Grass.jpg");
     auto data = new_magnus.get_data();
 
     size_t size = data.size();
@@ -25,4 +26,12 @@ int main()
 
     if (packet_size == size)
         std::cout << "Yes" << std::endl;
+
+    std::ofstream stream("hurt.flac.zst", std::ios::out | std::ios::binary);
+
+    auto zstd_compressor = ZSTD();
+    zstd_compressor.compress(data);
+    stream.write(
+        zstd_compressor.get_string()->data(),
+        zstd_compressor.get_string()->size());
 }
