@@ -15,10 +15,10 @@
         }                                    \
     } while (0)
 
-#define CHECK_ZSTD(fn)                                           \
-    do {                                                         \
-        size_t const err = (fn);                                 \
-        CHECK(!ZSTD_isError(err), "%s", ZSTD_getErrorName(err)); \
+#define CHECK_ZSTD(fn)                                                         \
+    do {                                                                       \
+        size_t const err = (fn);                                               \
+        CHECK(!ZSTD_isError(err), "[ERROR] ZSTD: %s", ZSTD_getErrorName(err)); \
     } while (0)
 
 class ZSTD : public Compression {
