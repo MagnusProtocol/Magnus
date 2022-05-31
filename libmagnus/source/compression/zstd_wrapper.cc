@@ -42,14 +42,14 @@ void ZSTD::decompress()
 std::string_view ZSTD::get_string_view()
 {
     if (!_buffer) {
-        std::cerr << "[ERROR] ZSTD: There isn't any buffer to return." << std::endl;
+        throw "[ERROR] ZSTD: There isn't any buffer to return.";
     }
     return std::string_view(*_buffer);
 }
 std::string* ZSTD::get_string()
 {
     if (!_buffer) {
-        std::cerr << "[ERROR] ZSTD: There isn't any buffer to return." << std::endl;
+        throw "[ERROR] ZSTD: There isn't any buffer to return.";
     }
     return _buffer;
 }

@@ -32,4 +32,34 @@ int main()
     stream_decompression.write(
         LZ4_decompressor.get_string()->data(),
         LZ4_decompressor.get_string()->size());
+
+    /*
+    |-------------------|
+    |    |    |    |    |
+    |    |    |    |    |
+    |    |    |    |    |
+    |    |    |    |    |
+    |___________________|
+
+    first, divide into parts by:
+        let f(x) = x % (ceil(sqrt(x)) + 2)
+        (size_t)part_size = f(file_size)
+        (float)number_of_parts = file_size / part_size
+
+        Now, extract the decimal part from number_of_parts alongside the one's place;
+        for example:
+            123324.42 -> 123320 + 4.42
+                 ____
+    */
+
+    double x = ceil(sqrt(data.size())) + 2;
+    double part_size = remainder(x, data.size());
+    double number_of_parts = data.size() / part_size;
+    double last_packet_padding = 1 - modf(number_of_parts, &last_packet_padding);
+    // HELL YEAH IT WORKS!
+    // Now, add the padding to the end of the last packet.
+
+    std::cout << "Part size: " << part_size << std::endl
+              << "Number of parts: " << number_of_parts << std::endl
+              << "Last packet's padding: " << last_packet_padding << std::endl;
 }
