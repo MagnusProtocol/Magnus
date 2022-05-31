@@ -1,4 +1,4 @@
-#include <iostream>
+#include "compression.hh"
 #include <zstd.h>
 
 #define CHECK(cond, ...)                     \
@@ -21,7 +21,7 @@
         CHECK(!ZSTD_isError(err), "%s", ZSTD_getErrorName(err)); \
     } while (0)
 
-class ZSTD {
+class ZSTD : public Compression {
 private:
     std::string* _buffer;
     std::string_view _input;
@@ -34,10 +34,9 @@ public:
     ZSTD(std::string_view& input);
     ~ZSTD();
 
-    void compress();
-
-    void decompress();
-
     std::string_view get_string_view();
     std::string* get_string();
+
+    void compress();
+    void decompress();
 };

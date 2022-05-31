@@ -3,8 +3,8 @@
 
 #include "sys/sysinfo.h"
 #include "sys/types.h"
+#include <compression/zstd_wrapper.hh>
 #include <iostream>
-#include <zstd_wrapper.hh>
 
 int main()
 {
