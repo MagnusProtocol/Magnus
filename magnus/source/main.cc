@@ -4,11 +4,12 @@
 #include "sys/sysinfo.h"
 #include "sys/types.h"
 #include <compression/lz4_wrapper.hh>
+#include <hashing/blake3_wrapper.hh>
 #include <iostream>
 
 int main()
 {
-    LibMagnus::Magnus new_magnus("/home/steve/Pictures/Wallpapers/Grass.jpg");
+    LibMagnus::Magnus new_magnus("/home/steve/Music/The Downward Spiral (1994)/14 - Hurt.flac");
     auto data = new_magnus.get_data();
 
     // Compression
@@ -61,5 +62,11 @@ int main()
 
     std::cout << "Part size: " << part_size << std::endl
               << "Number of parts: " << number_of_parts << std::endl
-              << "Last packet's padding: " << last_packet_padding << std::endl;
+              << "Last packet's padding: " << last_packet_padding << std::endl
+              << "Full file size: " << data.size() << std::endl
+              << "Full file size reconstruction: " << (size_t)(part_size * number_of_parts) << std::endl;
+
+    auto blake3_hash = BLAKE3(lz4_compressor.get_string_view());
+    auto hash = blake3_hash.hash();
+    std::cout << hash << std::endl;
 }

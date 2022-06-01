@@ -21,10 +21,10 @@ void LZ4::compress()
     _buffer->resize(c_size);
     // Check return_value to determine what happened.
     if (c_size <= 0)
-        throw "[ERROR] LZ4: Failed to compress file.1";
+        throw std::runtime_error("[ERROR] LZ4: Failed to compress file.");
 
     // Debug: print ratio
-    std::cout << (float)c_size / _input.size() << std::endl;
+    // std::cout << (float)c_size / _input.size() << std::endl;
 };
 
 void LZ4::decompress()
@@ -33,20 +33,20 @@ void LZ4::decompress()
     _buffer->resize(buffer_size);
     const int decompressed_size = LZ4_decompress_safe(_input.data(), _buffer->data(), _input.size(), buffer_size);
     if (decompressed_size < 0)
-        throw "[ERROR] LZ4: Failed to decompress file.";
+        throw std::runtime_error("[ERROR] LZ4: Failed to decompress file.");
 }
 
 std::string_view LZ4::get_string_view()
 {
     if (!_buffer) {
-        throw "[ERROR] LZ4: There isn't any buffer to return.";
+        throw std::runtime_error("[ERROR] LZ4: There isn't any buffer to return.");
     }
     return std::string_view(*_buffer);
 }
 std::string* LZ4::get_string()
 {
     if (!_buffer) {
-        throw "[ERROR] LZ4: There isn't any buffer to return.";
+        throw std::runtime_error("[ERROR] LZ4: There isn't any buffer to return.");
     }
     return _buffer;
 }

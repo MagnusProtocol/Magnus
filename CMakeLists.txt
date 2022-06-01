@@ -14,6 +14,7 @@ file(GLOB MAGNUS_SOURCES
 file(GLOB LIBMAGNUS_SOURCES
     libmagnus/source/*.cc
     libmagnus/source/compression/*.cc
+    libmagnus/source/hashing/*.cc
 )
 # Don't build the zstd static libs
 set(ZSTD_BUILD_STATIC OFF)
@@ -28,10 +29,13 @@ set(LZ4_BUILD_CLI OFF)
 # add lz4
 add_subdirectory(deps/lz4/build/cmake)
 
+# add blake3
+add_subdirectory(deps/BLAKE3/c)
+
 # Libmagnus (backend/protocol)
 add_library(libmagnus ${LIBMAGNUS_SOURCES})
 target_include_directories(libmagnus PUBLIC libmagnus/include)
-target_link_libraries(libmagnus PUBLIC libzstd_shared lz4)
+target_link_libraries(libmagnus PUBLIC blake3-shared libzstd_shared lz4)
 
 
 # Magnus (frontend/cli)
