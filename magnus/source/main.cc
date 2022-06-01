@@ -9,7 +9,7 @@
 
 int main()
 {
-    LibMagnus::Magnus new_magnus("/home/steve/Music/The Downward Spiral (1994)/14 - Hurt.flac");
+    LibMagnus::Magnus new_magnus("/home/steve/Music/The Downward Spiral (1994)/14 - Hurt.fla");
     auto data = new_magnus.get_data();
 
     // Compression

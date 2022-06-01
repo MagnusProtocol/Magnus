@@ -4,6 +4,7 @@
 
 // For mmap
 #include <cstring>
+#include <exception>
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -15,13 +16,13 @@ Magnus::Magnus(std::string filepath)
 {
     // Check if the file exists
     if (!std::filesystem::exists(filepath)) {
-        std::cerr << "[ERROR]: File does not exist." << std::endl;
+        throw std::runtime_error("[ERROR]: File does not exist.");
     }
 
     // Open the file, UNIX style
     _fd = open(filepath.c_str(), O_RDONLY);
     if (_fd == -1)
-        std::cerr << "[ERROR]: Could not open file." << std::endl;
+        throw std::runtime_error("[ERROR]: Could not open file.");
 
     // Map the file
     map_file();
@@ -41,13 +42,13 @@ void Magnus::map_file()
     // Get file length
     struct stat sb;
     if (fstat(_fd, &sb) == -1)
-        std::cerr << "[ERROR]: Could not fstat" << std::endl;
+        throw std::runtime_error("[ERROR]: Could not fstat");
 
     _length = sb.st_size;
 
     _addr = mmap(NULL, _length, PROT_READ, MAP_PRIVATE, _fd, 0u);
     if (_addr == MAP_FAILED)
-        std::cerr << "[ERROR]: Could not mmap" << std::endl;
+        throw std::runtime_error("[ERROR]: Could not mmap");
 }
 
 std::string_view Magnus::get_data()
