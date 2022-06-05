@@ -35,7 +35,7 @@ public:
     ~ZSTD();
 
     std::string_view get_string_view();
-    std::string* get_string();
+    std::string& get_string();
 
     void compress();
     void decompress();

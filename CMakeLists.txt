@@ -5,6 +5,7 @@ project("Magnus")
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_MACOSX_RPATH 1)
 
 # Get all C++ files
 file(GLOB MAGNUS_SOURCES
@@ -34,8 +35,11 @@ add_subdirectory(deps/BLAKE3/c)
 
 # Libmagnus (backend/protocol)
 add_library(libmagnus ${LIBMAGNUS_SOURCES})
-target_include_directories(libmagnus PUBLIC libmagnus/include)
-target_link_libraries(libmagnus PUBLIC blake3-shared libzstd_shared lz4)
+target_include_directories(libmagnus PUBLIC 
+    libmagnus/include
+    deps/zstd/lib
+)
+target_link_libraries(libmagnus PUBLIC blake3-shared libzstd_shared lz4_shared)
 
 
 # Magnus (frontend/cli)

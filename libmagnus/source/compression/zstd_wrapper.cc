@@ -11,9 +11,9 @@ ZSTD::ZSTD(std::string_view& input)
 
 ZSTD::~ZSTD()
 {
+    delete _buffer;
     ZSTD_freeCCtx(_cctx);
     ZSTD_freeDCtx(_dctx);
-    delete _buffer;
 }
 
 void ZSTD::compress()
@@ -29,8 +29,8 @@ void ZSTD::compress()
 void ZSTD::decompress()
 {
     unsigned long long const r_size = ZSTD_getFrameContentSize(_input.data(), _input.size());
-    CHECK(r_size != ZSTD_CONTENTSIZE_ERROR, "%s: not compressed by zstd!");
-    CHECK(r_size != ZSTD_CONTENTSIZE_UNKNOWN, "%s: original size unknown!");
+    CHECK(r_size != ZSTD_CONTENTSIZE_ERROR, "[ERROR] ZSTD: Not compressed by zstd!");
+    CHECK(r_size != ZSTD_CONTENTSIZE_UNKNOWN, "[ERROR] ZSTD: Original size unknown!");
 
     _buffer->resize(size_t(r_size));
     size_t const d_size = ZSTD_decompressDCtx(_dctx, _buffer->data(), r_size, _input.data(), _input.size());
@@ -41,15 +41,15 @@ void ZSTD::decompress()
 
 std::string_view ZSTD::get_string_view()
 {
-    if (!_buffer) {
+    if (_buffer->empty()) {
         throw std::runtime_error("[ERROR] ZSTD: There isn't any buffer to return.");
     }
     return std::string_view(*_buffer);
 }
-std::string* ZSTD::get_string()
+std::string& ZSTD::get_string()
 {
-    if (!_buffer) {
+    if (_buffer->empty()) {
         throw std::runtime_error("[ERROR] ZSTD: There isn't any buffer to return.");
     }
-    return _buffer;
+    return *_buffer;
 }

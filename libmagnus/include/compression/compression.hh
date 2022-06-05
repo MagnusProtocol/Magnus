@@ -10,10 +10,9 @@ public:
         throw std::runtime_error("[ERROR]: Not yet implemented.");
         return nullptr;
     };
-    virtual std::string* get_string()
+    virtual std::string& get_string()
     {
         throw std::runtime_error("[ERROR]: Not yet implemented.");
-        return nullptr;
     };
 
     virtual void compress() { throw std::runtime_error("[ERROR]: Not yet implemented."); }

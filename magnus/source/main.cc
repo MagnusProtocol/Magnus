@@ -1,38 +1,38 @@
 #include <cmath>
 #include <magnus.hh>
 
-#include "sys/sysinfo.h"
 #include "sys/types.h"
 #include <compression/lz4_wrapper.hh>
+#include <filesystem>
 #include <hashing/blake3_wrapper.hh>
 #include <iostream>
 
 int main()
 {
-    LibMagnus::Magnus new_magnus("/home/steve/Music/The Downward Spiral (1994)/14 - Hurt.fla");
+    LibMagnus::Magnus new_magnus("../assets/image.jpg");
     auto data = new_magnus.get_data();
 
     // Compression
-    std::ofstream stream_compression("compressed.jpg.zst", std::ios::out | std::ios::binary);
-    auto lz4_compressor = LZ4(data);
+    std::ofstream stream_compression("compressed.jpg.zstd", std::ios::out | std::ios::binary);
+    auto ZSTD_compressor = LZ4(data);
 
-    lz4_compressor.compress();
+    ZSTD_compressor.compress();
 
     stream_compression.write(
-        lz4_compressor.get_string()->data(),
-        lz4_compressor.get_string()->size());
+        ZSTD_compressor.get_string().data(),
+        ZSTD_compressor.get_string().size());
 
     // Decompression
     std::ofstream stream_decompression("decompressed.jpg", std::ios::out | std::ios::binary);
 
-    auto compressed_string = lz4_compressor.get_string_view();
-    auto LZ4_decompressor = LZ4(compressed_string);
+    auto compressed_string = ZSTD_compressor.get_string_view();
+    auto ZSTD_decompressor = LZ4(compressed_string);
 
-    LZ4_decompressor.decompress();
+    ZSTD_decompressor.decompress();
 
     stream_decompression.write(
-        LZ4_decompressor.get_string()->data(),
-        LZ4_decompressor.get_string()->size());
+        ZSTD_decompressor.get_string().data(),
+        ZSTD_decompressor.get_string().size());
 
     /*
     |-------------------|
@@ -66,7 +66,7 @@ int main()
               << "Full file size: " << data.size() << std::endl
               << "Full file size reconstruction: " << (size_t)(part_size * number_of_parts) << std::endl;
 
-    auto blake3_hash = BLAKE3(lz4_compressor.get_string_view());
+    auto blake3_hash = BLAKE3(ZSTD_compressor.get_string_view());
     auto hash = blake3_hash.hash();
     std::cout << hash << std::endl;
 }

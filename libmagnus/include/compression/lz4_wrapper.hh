@@ -3,7 +3,7 @@
 
 class LZ4 : public Compression {
 private:
-    std::string* _buffer;
+    std::string _buffer;
     std::string_view _input;
 
 public:
@@ -11,7 +11,7 @@ public:
     ~LZ4();
 
     std::string_view get_string_view();
-    std::string* get_string();
+    std::string& get_string();
 
     void compress();
     void decompress();

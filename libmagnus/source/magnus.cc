@@ -28,7 +28,7 @@ Magnus::Magnus(std::string filepath)
     map_file();
 
     // Populate data
-    _data = std::string_view(static_cast<const char*>(_addr), static_cast<const char*>(_addr) + _length);
+    _data = std::string_view(static_cast<const char*>(_addr), _length);
 }
 
 Magnus::~Magnus()
