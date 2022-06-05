@@ -16,6 +16,7 @@ file(GLOB LIBMAGNUS_SOURCES
     libmagnus/source/*.cc
     libmagnus/source/compression/*.cc
     libmagnus/source/hashing/*.cc
+    libmagnus/source/slicing/*.cc
 )
 # Don't build the zstd static libs
 set(ZSTD_BUILD_STATIC OFF)
