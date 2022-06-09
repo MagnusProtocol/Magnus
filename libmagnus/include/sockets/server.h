@@ -6,7 +6,6 @@
 
 namespace LibMagnus
 {
-
     /*
     * Abstract class containing the structor of a server.
     */
@@ -19,9 +18,11 @@ namespace LibMagnus
 
         virtual Server& Listen();
         virtual Server& Accept();
+        virtual Server& Send(int);
+        virtual Server& Initialize();
         virtual int Receive();
         virtual int Read(); // Reads the buffer sent by client.
-        virtual Server& Initialize();
+
     public:
         static constexpr ulong MaxBufferLength = 4096;
 

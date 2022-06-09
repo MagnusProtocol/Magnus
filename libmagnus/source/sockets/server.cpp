@@ -21,7 +21,7 @@ namespace LibMagnus
 
     int Server::Receive()
     {
-        recv(this->ConnectionID, this->Buffer, Server::MaxBufferLength, 0);
+        return recv(this->ConnectionID, this->Buffer, this->MaxBufferLength, 0);
     }
 
     Server& Server::Initialize()
@@ -40,10 +40,33 @@ namespace LibMagnus
         this->Listen();
     }
 
-    void Server::Run()
+    Server& Server::Send(int bytes)
     {
+        send(this->ConnectionID, this->Buffer, bytes, 0);
     }
 
+    int Server::Read()
+    {
+        int bytes = 0;
+
+        while ((bytes = this->Receive()) > 0)
+        {
+            this->Send(bytes);
+        }
+
+        return bytes;
+    }
+
+    void Server::Run()
+    {
+        for (;;)
+        {
+            this->Accept();
+
+            if (this->Read() < 0) // error check; todo: log
+                close(this->ConnectionID);
+        }
+    }
 
     Server::~Server()
     {
