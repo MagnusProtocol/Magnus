@@ -2,7 +2,7 @@
 #include <magnus.h>
 
 
-#include "sockets/socket.h"
+#include "sockets/tcp.h"
 #include "sys/sysinfo.h"
 #include "sys/types.h"
 #include <compression/lz4_wrapper.hh>
@@ -38,7 +38,7 @@
 
 int main()
 {
-    LibMagnus::Socket socket = LibMagnus::Socket();
+    LibMagnus::TCPServer tcp = LibMagnus::TCPServer();
 
 
     return 0;

@@ -20,7 +20,7 @@ namespace LibMagnus
         virtual Server& Listen();
         virtual Server& Accept();
         virtual int Receive();
-
+        virtual int Read(); // Reads the buffer sent by client.
         virtual Server& Initialize();
     public:
         static constexpr ulong MaxBufferLength = 4096;
