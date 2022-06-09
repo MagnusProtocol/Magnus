@@ -1,4 +1,4 @@
-#include "magnus.hh"
+#include "magnus.h"
 #include <filesystem>
 #include <string.h>
 

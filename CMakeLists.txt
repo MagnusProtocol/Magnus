@@ -8,12 +8,12 @@ set(CMAKE_BUILD_TYPE Debug)
 
 # Get all C++ files
 file(GLOB MAGNUS_SOURCES
-    magnus/source/*.cc
+    magnus/source/*.cpp
 )
 
 file(GLOB LIBMAGNUS_SOURCES
-    libmagnus/source/*.cc
-    libmagnus/source/compression/*.cc
+    libmagnus/source/*.cpp
+    libmagnus/source/sockets/*.cpp
 )
 # Don't build the zstd static libs
 set(ZSTD_BUILD_STATIC OFF)
