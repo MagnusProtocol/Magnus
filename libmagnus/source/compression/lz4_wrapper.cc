@@ -1,6 +1,7 @@
 #include "compression/lz4_wrapper.hh"
 #include <lz4.h>
 
+namespace Magnus::Compression {
 LZ4::LZ4(std::string_view& input)
 {
     _input = input;
@@ -10,7 +11,7 @@ LZ4::~LZ4()
 {
 }
 
-void LZ4::compress()
+void LZ4::compress_string()
 {
     const size_t buffer_size = LZ4_compressBound(_input.size());
     _buffer.resize(buffer_size);
@@ -25,7 +26,7 @@ void LZ4::compress()
     // std::cout << (float)c_size / _input.size() << std::endl;
 };
 
-void LZ4::decompress()
+void LZ4::decompress_string()
 {
     const size_t buffer_size = LZ4_compressBound(_input.size());
     _buffer.resize(buffer_size);
@@ -33,6 +34,10 @@ void LZ4::decompress()
     if (decompressed_size < 0)
         throw std::runtime_error("[ERROR] LZ4: Failed to decompress file.");
 }
+
+void LZ4::compress_file() {}
+
+void LZ4::decompress_file() {}
 
 std::string_view LZ4::get_string_view()
 {
@@ -48,3 +53,5 @@ std::string& LZ4::get_string()
     }
     return _buffer;
 }
+
+};

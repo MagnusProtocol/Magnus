@@ -1,33 +1,32 @@
 #include <compression/zstd_wrapper.hh>
+#include <cstdio>
 #include <hashing/blake3_wrapper.hh>
 #include <magnus.hh>
 #include <slicing/slicing.hh>
+
+constexpr size_t BUFFER_SIZE = 1024;
+
 int main()
 {
-    // Read the file and get it's contents.
-    LibMagnus::Magnus new_magnus("../assets/image.jpg");
-    auto data = new_magnus.get_data();
+    std::filesystem::path filepath_image = "../assets/image.jpg";
+    auto zstd_compressor = Magnus::Compression::ZSTD(filepath_image, Magnus::Compression::COMPRESS);
+    zstd_compressor.compress_file();
 
-    // Compression
-    std::ofstream stream_compression("compressed.jpg.zstd", std::ios::out | std::ios::binary);
-    auto ZSTD_compressor = ZSTD(data);
-    ZSTD_compressor.compress();
-    stream_compression.write(
-        ZSTD_compressor.get_string().data(),
-        ZSTD_compressor.get_string().size());
+    std::ofstream compression_stream("./compressed.jpg.zst", std::ios::out | std::ios::binary);
+    compression_stream.write(zstd_compressor.get_string_view().data(),
+                             zstd_compressor.get_string_view().size());
 
-    // Decompression
-    std::ofstream stream_decompression("decompressed.jpg", std::ios::out | std::ios::binary);
-    auto compressed_string = ZSTD_compressor.get_string_view();
-    auto ZSTD_decompressor = ZSTD(compressed_string);
-    ZSTD_decompressor.decompress();
-    stream_decompression.write(
-        ZSTD_decompressor.get_string().data(),
-        ZSTD_decompressor.get_string().size());
+    std::filesystem::path filepath_compressed_image = "./compressed.jpg.zst";
+    auto zstd_decompressor = Magnus::Compression::ZSTD(filepath_compressed_image, Magnus::Compression::DECOMPRESS);
+    zstd_decompressor.decompress_file();
 
-    auto slices = Slicing::slice_into_parts(data);
+    std::ofstream decompression_stream("decompressed.jpg", std::ios::out | std::ios::binary);
+    decompression_stream.write(zstd_decompressor.get_string_view().data(),
+                             zstd_decompressor.get_string_view().size());
 
-    auto blake3_hash = BLAKE3(ZSTD_compressor.get_string_view());
+    auto blake3_hash = BLAKE3(zstd_compressor.get_string_view());
     auto hash = blake3_hash.hash();
     std::cout << hash << std::endl;
+
+
 }
