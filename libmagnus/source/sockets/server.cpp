@@ -4,6 +4,8 @@ namespace LibMagnus
 {
     Server::Server()
     {
+        this->Buffer.reserve(this->MaxBufferLength);
+
         this->Initialize();
     }
 
@@ -21,7 +23,7 @@ namespace LibMagnus
 
     int Server::Receive()
     {
-        return recv(this->ConnectionID, this->Buffer, this->MaxBufferLength, 0);
+        return recv(this->ConnectionID, const_cast<char*>(this->Buffer.c_str()), this->MaxBufferLength, 0);
     }
 
     Server& Server::Initialize()
@@ -42,7 +44,7 @@ namespace LibMagnus
 
     Server& Server::Send(int bytes)
     {
-        send(this->ConnectionID, this->Buffer, bytes, 0);
+        send(this->ConnectionID, const_cast<char*>(this->Buffer.c_str()), bytes, 0);
     }
 
     int Server::Read()

@@ -8,11 +8,11 @@ namespace LibMagnus
     class TCPServer : public Server
     {
     public:
-        void Run() override;
+        // void Run() override;
 
         TCPServer();
-        TCPServer(TCPServer&);
-        TCPServer(TCPServer&&);
+        TCPServer(TCPServer&) = default;
+        TCPServer(TCPServer&&) = default;
         ~TCPServer();
     };
 }

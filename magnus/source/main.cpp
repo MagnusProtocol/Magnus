@@ -40,6 +40,7 @@ int main()
 {
     LibMagnus::TCPServer tcp = LibMagnus::TCPServer();
 
+    tcp.Run();
 
     return 0;
 }

@@ -2,6 +2,7 @@
 #define SERVER_H
 
 #include <cinttypes>
+#include <string>
 #include "socket.h"
 
 namespace LibMagnus
@@ -24,12 +25,12 @@ namespace LibMagnus
         virtual int Read(); // Reads the buffer sent by client.
 
     public:
-        static constexpr ulong MaxBufferLength = 4096;
+        ulong MaxBufferLength {4096};
 
         uint8_t ConnectionID;
 
-         // Maximum length of the payload buffer
-        char Buffer[Server::MaxBufferLength];
+        // Maximum length of the payload buffer
+        std::string Buffer;
 
         sockaddr_in Address; // Server address
 
