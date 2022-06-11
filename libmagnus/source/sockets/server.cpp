@@ -12,6 +12,9 @@ namespace LibMagnus
     Server& Server::Listen()
     {
         listen(this->mSocket.ID, this->MaxConnections);
+        #ifdef LOG
+        std::cout << "Server socket listening on port " << this->Port << '\n';
+        #endif
     }
 
     Server& Server::Accept()
@@ -53,6 +56,10 @@ namespace LibMagnus
 
         while ((bytes = this->Receive()) > 0)
         {
+            #ifdef LOG
+            std::cout << "Recieved buffer: " << this->Buffer << '\n';
+            #endif
+
             this->Send(bytes);
         }
 
@@ -66,7 +73,12 @@ namespace LibMagnus
             this->Accept();
 
             if (this->Read() < 0) // error check; todo: log
+            {
+                #ifdef LOG
+                std::cout << "Closing the connection with ID ." << this->ConnectionID << '\n';
+                #endif
                 close(this->ConnectionID);
+            }
         }
     }
 

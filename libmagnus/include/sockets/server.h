@@ -5,6 +5,12 @@
 #include <string>
 #include "socket.h"
 
+#define LOG
+
+#ifdef LOG
+#include <iostream>
+#endif
+
 namespace LibMagnus
 {
     /*
@@ -25,7 +31,7 @@ namespace LibMagnus
         virtual int Read(); // Reads the buffer sent by client.
 
     public:
-        ulong MaxBufferLength {4096};
+        ulong MaxBufferLength { 4096 };
 
         uint8_t ConnectionID;
 
@@ -34,7 +40,7 @@ namespace LibMagnus
 
         sockaddr_in Address; // Server address
 
-        sockaddr_in ClientAddress; // Client addres
+        sockaddr_in ClientAddress; // Client address
 
         uint16_t Port { 3000 }; // Socket port
 
