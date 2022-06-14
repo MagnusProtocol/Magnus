@@ -5,7 +5,6 @@ namespace Magnus::Compression {
 ZSTD::ZSTD(std::string_view& input)
 {
     _input = input;
-    _buffer = new std::string;
 
     _cctx = ZSTD_createCCtx();
     _dctx = ZSTD_createDCtx();
@@ -16,12 +15,12 @@ ZSTD::ZSTD(std::string_view& input)
 
     _buff_in = nullptr;
     _buff_out = nullptr;
+
 }
 
 ZSTD::ZSTD(std::filesystem::path filename, int mode)
 {
     _fin = fopen(filename.c_str(), "rb");
-    _buffer = new std::string;
 
     _cctx = ZSTD_createCCtx();
     _dctx = ZSTD_createDCtx();
@@ -45,7 +44,6 @@ ZSTD::ZSTD(std::filesystem::path filename, int mode)
 
 ZSTD::~ZSTD()
 {
-    delete _buffer;
 
     ZSTD_freeCCtx(_cctx);
     ZSTD_freeDCtx(_dctx);
@@ -63,10 +61,10 @@ ZSTD::~ZSTD()
  * */
 std::string_view ZSTD::get_string_view()
 {
-    if (_buffer->empty()) {
+    if (_buffer.empty()) {
         throw std::runtime_error("[ERROR] ZSTD: There isn't any buffer to return.");
     }
-    return std::string_view(*_buffer);
+    return std::string_view(_buffer);
 }
 
 /*
@@ -89,12 +87,12 @@ std::string& ZSTD::get_string()
 void ZSTD::compress_string()
 {
     const size_t buffer_size = ZSTD_compressBound(_input.size());
-    _buffer->resize(buffer_size);
+    _buffer.resize(buffer_size);
 
-    size_t const c_size = ZSTD_compressCCtx(_cctx, _buffer->data(), buffer_size, _input.data(), _input.size(), 2);
+    size_t const c_size = ZSTD_compressCCtx(_cctx, _buffer.data(), buffer_size, _input.data(), _input.size(), 2);
 
     CHECK_ZSTD(c_size);
-    _buffer->resize(c_size);
+    _buffer.resize(c_size);
 }
 
 /*
@@ -109,8 +107,8 @@ void ZSTD::decompress_string()
     CHECK(r_size != ZSTD_CONTENTSIZE_ERROR, "[ERROR] ZSTD: Not compressed by zstd!");
     CHECK(r_size != ZSTD_CONTENTSIZE_UNKNOWN, "[ERROR] ZSTD: Original size unknown!");
 
-    _buffer->resize(size_t(r_size));
-    size_t const d_size = ZSTD_decompressDCtx(_dctx, _buffer->data(), r_size, _input.data(), _input.size());
+    _buffer.resize(size_t(r_size));
+    size_t const d_size = ZSTD_decompressDCtx(_dctx, _buffer.data(), r_size, _input.data(), _input.size());
 
     // When zstd knows the content size, it will error if it doesn't match.
     CHECK_ZSTD(d_size);
@@ -140,7 +138,7 @@ void ZSTD::compress_file()
             size_t const remaining = ZSTD_compressStream2(_cctx, &output, &input, mode);
 
             CHECK_ZSTD(remaining);
-            _buffer->append((char*)_buff_out, output.pos);
+            _buffer.append((char*)_buff_out, output.pos);
 
             finished = last_chunk ? (remaining == 0) : (input.pos == input.size);
         } while (!finished);
@@ -185,7 +183,7 @@ void ZSTD::decompress_file()
              */
             size_t const ret = ZSTD_decompressStream(_dctx, &output , &input);
             CHECK_ZSTD(ret);
-            _buffer->append(static_cast<const char*>(_buff_out), output.pos);
+            _buffer.append(static_cast<const char*>(_buff_out), output.pos);
             lastRet = ret;
         }
     }

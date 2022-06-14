@@ -1,6 +1,8 @@
 #include "hashing/blake3_wrapper.hh"
 #include <array>
 #include <blake3.h>
+
+namespace Magnus::Hashing {
 BLAKE3::BLAKE3(std::string_view input)
     : _input(input)
 {
@@ -32,3 +34,4 @@ std::string BLAKE3::hash()
 
     return uint8_vector_to_hex_string(_buffer);
 }
+};

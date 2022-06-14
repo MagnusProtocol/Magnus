@@ -32,7 +32,7 @@ DECOMPRESS = 0x234,
 class ZSTD : public CompressionBase {
 private:
     // String buffer for storing the comrpessed data
-    std::string* _buffer;
+    std::string _buffer;
     // String view for taking in a string to compress
     std::string_view _input;
     // Path to the file to be compressed

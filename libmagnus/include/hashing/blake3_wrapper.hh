@@ -3,7 +3,8 @@
 #include <blake3.h>
 #include <vector>
 
-class BLAKE3 : public Hashing {
+namespace Magnus::Hashing {
+class BLAKE3 : public HashingBase {
 
 private:
     std::string_view _input;
@@ -16,4 +17,5 @@ public:
     ~BLAKE3();
 
     std::string hash();
+};
 };

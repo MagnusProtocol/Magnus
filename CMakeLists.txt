@@ -43,6 +43,8 @@ target_include_directories(libmagnus PUBLIC
 )
 target_link_libraries(libmagnus PUBLIC blake3-shared libzstd_shared lz4_shared)
 
+target_compile_options(libmagnus PRIVATE -fsanitize=address)
+target_link_options(libmagnus PRIVATE -fsanitize=address)
 
 # Magnus (frontend/cli)
 add_executable(magnus ${MAGNUS_SOURCES})

@@ -3,8 +3,7 @@
 #include <hashing/blake3_wrapper.hh>
 #include <magnus.hh>
 #include <slicing/slicing.hh>
-
-constexpr size_t BUFFER_SIZE = 1024;
+#include <chrono>
 
 int main()
 {
@@ -24,7 +23,7 @@ int main()
     decompression_stream.write(zstd_decompressor.get_string_view().data(),
                              zstd_decompressor.get_string_view().size());
 
-    auto blake3_hash = BLAKE3(zstd_compressor.get_string_view());
+    auto blake3_hash = Magnus::Hashing::BLAKE3(zstd_compressor.get_string_view());
     auto hash = blake3_hash.hash();
     std::cout << hash << std::endl;
 

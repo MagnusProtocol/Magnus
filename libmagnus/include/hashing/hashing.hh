@@ -5,10 +5,10 @@
 #include <string>
 #include <vector>
 
-class Hashing {
+class HashingBase {
 public:
-    Hashing() {};
-    ~Hashing() {};
+    HashingBase() {};
+    ~HashingBase() {};
     virtual std::string_view get_string_view()
     {
         throw std::runtime_error("[ERROR]: Not yet implemented.");
