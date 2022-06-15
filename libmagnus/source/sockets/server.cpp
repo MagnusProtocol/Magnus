@@ -68,7 +68,9 @@ namespace LibMagnus
 
     void Server::Run()
     {
-        for (;;)
+        this->Running = 1;
+
+        while (this->Running)
         {
             this->Accept();
 
@@ -78,6 +80,8 @@ namespace LibMagnus
                 std::cout << "Closing the connection with ID ." << this->ConnectionID << '\n';
                 #endif
                 close(this->ConnectionID);
+
+                this->Running = 0;
             }
         }
     }

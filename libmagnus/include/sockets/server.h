@@ -35,6 +35,8 @@ namespace LibMagnus
 
         uint8_t ConnectionID;
 
+        uint8_t Running;
+
         // Maximum length of the payload buffer
         std::string Buffer;
 
@@ -57,4 +59,4 @@ namespace LibMagnus
     };
 }
 
-#endif // SERVER_H_
+#endif // SERVER_H
