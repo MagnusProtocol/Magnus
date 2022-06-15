@@ -1,7 +1,8 @@
 #pragma once
 
-#include <fstream>
-#include <iostream>
+#include <hashing/blake3_wrapper.hh>
+#include <compression/zstd_wrapper.hh>
+#include <slicing/slicing.hh>
 
 namespace LibMagnus {
 class Magnus {

@@ -7,3 +7,6 @@
 [submodule "deps/BLAKE3"]
 	path = deps/BLAKE3
 	url = https://github.com/SteveGremory/BLAKE3
+[submodule "deps/spdlog"]
+	path = deps/spdlog
+	url = https://github.com/gabime/spdlog

@@ -2,7 +2,7 @@
 #include <array>
 #include <blake3.h>
 
-namespace Magnus::Hashing {
+namespace Magnus::LibMagnus::Hashing {
 BLAKE3::BLAKE3(std::string_view input)
     : _input(input)
 {

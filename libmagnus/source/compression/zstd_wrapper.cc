@@ -1,10 +1,33 @@
 #include "compression/zstd_wrapper.hh"
 #include <thread>
 
-namespace Magnus::Compression {
+#define CHECK(cond, ...)                     \
+    do {                                     \
+        if (!(cond)) {                       \
+            fprintf(stderr,                  \
+                "%s:%d CHECK(%s) failed: ",  \
+                __FILE__,                    \
+                __LINE__,                    \
+                #cond);                      \
+            fprintf(stderr, "" __VA_ARGS__); \
+            fprintf(stderr, "\n");           \
+            exit(1);                         \
+        }                                    \
+    } while (0)
+
+#define CHECK_ZSTD(fn)                                                         \
+    do {                                                                       \
+        size_t const err = (fn);                                               \
+        CHECK(!ZSTD_isError(err), "[ERROR] ZSTD: %s", ZSTD_getErrorName(err)); \
+    } while (0)
+
+namespace Magnus::LibMagnus::Compression {
 ZSTD::ZSTD(std::string_view& input)
 {
     _input = input;
+
+    // Setup spdlog
+    SET_LOGGER("ZSTD", _logger);
 
     _cctx = ZSTD_createCCtx();
     _dctx = ZSTD_createDCtx();
@@ -16,10 +39,15 @@ ZSTD::ZSTD(std::string_view& input)
     _buff_in = nullptr;
     _buff_out = nullptr;
 
+    _fin = nullptr;
+    _filename = nullptr;
 }
 
 ZSTD::ZSTD(std::filesystem::path filename, int mode)
 {
+    // Setup spdlog
+    SET_LOGGER("ZSTD", _logger);
+
     _fin = fopen(filename.c_str(), "rb");
 
     _cctx = ZSTD_createCCtx();
@@ -39,7 +67,6 @@ ZSTD::ZSTD(std::filesystem::path filename, int mode)
 
     _buff_in = malloc(_buff_in_size);
     _buff_out = malloc(_buff_out_size);
-
 }
 
 ZSTD::~ZSTD()
@@ -62,7 +89,7 @@ ZSTD::~ZSTD()
 std::string_view ZSTD::get_string_view()
 {
     if (_buffer.empty()) {
-        throw std::runtime_error("[ERROR] ZSTD: There isn't any buffer to return.");
+        _logger->error("ZSTD: There isn't any buffer to return.");
     }
     return std::string_view(_buffer);
 }
@@ -73,13 +100,10 @@ std::string_view ZSTD::get_string_view()
 // TODO: Fix strings
 std::string& ZSTD::get_string()
 {
-    /*
-    if (_buffer->empty()) {
-        throw std::runtime_error("[ERROR] ZSTD: There isn't any buffer to return.");
+    if (_buffer.empty()) {
+        _logger->error("ZSTD: There isn't any buffer to return.");
     }
-    return *_buffer;
-    */
-    throw std::runtime_error("Strings do not work with the ZSTD implementation. Please consider using the string_view getter.");
+    return _buffer;
 }
 /*
  *  @brief: This method uses the string set by the ZSTD string constructor and decompresses it.
@@ -101,11 +125,11 @@ void ZSTD::compress_string()
 void ZSTD::decompress_string()
 {
     if (_input.empty() == true)
-        throw std::runtime_error("[ERROR] Magnus: Please use the correct constructor.");
+        _logger->error("Magnus: Please use the correct constructor.");
 
     unsigned long long const r_size = ZSTD_getFrameContentSize(_input.data(), _input.size());
-    CHECK(r_size != ZSTD_CONTENTSIZE_ERROR, "[ERROR] ZSTD: Not compressed by zstd!");
-    CHECK(r_size != ZSTD_CONTENTSIZE_UNKNOWN, "[ERROR] ZSTD: Original size unknown!");
+    CHECK(r_size != ZSTD_CONTENTSIZE_ERROR, "ZSTD: Not compressed by zstd!");
+    CHECK(r_size != ZSTD_CONTENTSIZE_UNKNOWN, "ZSTD: Original size unknown!");
 
     _buffer.resize(size_t(r_size));
     size_t const d_size = ZSTD_decompressDCtx(_dctx, _buffer.data(), r_size, _input.data(), _input.size());
@@ -144,7 +168,7 @@ void ZSTD::compress_file()
         } while (!finished);
 
         CHECK(input.pos == input.size,
-              "[ERROR] ZSTD: zstd only returns 0 when the input is completely consumed!");
+            "ZSTD: zstd only returns 0 when the input is completely consumed!");
 
         if (last_chunk) {
             break;
@@ -162,10 +186,10 @@ void ZSTD::decompress_file()
      */
     size_t const toRead = _buff_in_size;
     size_t read;
-    size_t lastRet = 0;
-    int isEmpty = 1;
-    while ( (read = fread(_buff_in, 1, toRead, _fin)) ) {
-        isEmpty = 0;
+    // size_t lastRet = 0;
+    // int isEmpty = 1;
+    while ((read = fread(_buff_in, 1, toRead, _fin))) {
+        // isEmpty = 0;
         ZSTD_inBuffer input = { _buff_in, read, 0 };
         /* Given a valid frame, zstd won't consume the last byte of the frame
          * until it has flushed all of the decompressed data of the frame.
@@ -181,10 +205,10 @@ void ZSTD::decompress_file()
              * state, for instance if the last decompression call returned an
              * error.
              */
-            size_t const ret = ZSTD_decompressStream(_dctx, &output , &input);
+            size_t const ret = ZSTD_decompressStream(_dctx, &output, &input);
             CHECK_ZSTD(ret);
             _buffer.append(static_cast<const char*>(_buff_out), output.pos);
-            lastRet = ret;
+            // lastRet = ret;
         }
     }
 }

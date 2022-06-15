@@ -2,7 +2,7 @@
 #include <cmath>
 #include <iostream>
 
-namespace Magnus::Slicing {
+namespace Magnus::LibMagnus::Slicing {
 
 std::vector<std::string_view> slice_into_parts(std::string_view data)
 {

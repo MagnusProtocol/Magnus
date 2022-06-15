@@ -1,32 +1,13 @@
+#pragma once
 #include "compression.hh"
-#include <zstd.h>
 #include <filesystem>
+#include <zstd.h>
 
-#define CHECK(cond, ...)                     \
-    do {                                     \
-        if (!(cond)) {                       \
-            fprintf(stderr,                  \
-                "%s:%d CHECK(%s) failed: ",  \
-                __FILE__,                    \
-                __LINE__,                    \
-                #cond);                      \
-            fprintf(stderr, "" __VA_ARGS__); \
-            fprintf(stderr, "\n");           \
-            exit(1);                         \
-        }                                    \
-    } while (0)
-
-#define CHECK_ZSTD(fn)                                                         \
-    do {                                                                       \
-        size_t const err = (fn);                                               \
-        CHECK(!ZSTD_isError(err), "[ERROR] ZSTD: %s", ZSTD_getErrorName(err)); \
-    } while (0)
-
-namespace Magnus::Compression {
+namespace Magnus::LibMagnus::Compression {
 
 enum MODES {
-COMPRESS = 0x123,
-DECOMPRESS = 0x234,
+    COMPRESS = 0x123,
+    DECOMPRESS = 0x234,
 };
 
 class ZSTD : public CompressionBase {
@@ -53,6 +34,9 @@ private:
 
     // File pointer in case we need it
     FILE* _fin;
+
+    // Spdlog logger, multithreaded stderr
+    std::shared_ptr<spdlog::logger> _logger;
 
 public:
     ZSTD(std::string_view& input);

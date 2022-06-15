@@ -3,7 +3,7 @@
 #include <string_view>
 #include <vector>
 
-namespace Magnus::Slicing {
+namespace Magnus::LibMagnus::Slicing {
 
 /*
  * @brief: The function takes in a string view and slices it into parts

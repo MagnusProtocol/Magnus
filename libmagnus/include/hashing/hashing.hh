@@ -1,6 +1,8 @@
 #pragma once
+#include "utils.hh"
 #include <iomanip>
 #include <iostream>
+#include <spdlog/spdlog.h>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -11,19 +13,19 @@ public:
     ~HashingBase() {};
     virtual std::string_view get_string_view()
     {
-        throw std::runtime_error("[ERROR]: Not yet implemented.");
+        spdlog::error("Not yet implemented.");
         return nullptr;
     };
 
     virtual std::string* get_string()
     {
-        throw std::runtime_error("[ERROR]: Not yet implemented.");
+        spdlog::error("Not yet implemented.");
         return nullptr;
     };
 
     virtual std::string hash()
     {
-        throw std::runtime_error("[ERROR]: Not yet implemented.");
+        spdlog::error("Not yet implemented.");
         return nullptr;
     }
 };

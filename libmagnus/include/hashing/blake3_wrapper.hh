@@ -3,7 +3,7 @@
 #include <blake3.h>
 #include <vector>
 
-namespace Magnus::Hashing {
+namespace Magnus::LibMagnus::Hashing {
 class BLAKE3 : public HashingBase {
 
 private:

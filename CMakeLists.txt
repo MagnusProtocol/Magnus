@@ -35,15 +35,46 @@ add_subdirectory(deps/lz4/build/cmake)
 # add blake3
 add_subdirectory(deps/BLAKE3/c)
 
+# add spdlog
+add_subdirectory(deps/spdlog)
+
 # Libmagnus (backend/protocol)
+
+# Add all the sources
 add_library(libmagnus ${LIBMAGNUS_SOURCES})
+# Add all the includes
 target_include_directories(libmagnus PUBLIC 
     libmagnus/include
     deps/zstd/lib
 )
-target_link_libraries(libmagnus PUBLIC blake3-shared libzstd_shared lz4_shared)
+# Link all the needed libraries
+target_link_libraries(libmagnus PUBLIC
+    blake3-shared
+    libzstd_shared
+    lz4_shared
+    spdlog
+)
 
-target_compile_options(libmagnus PRIVATE -fsanitize=address)
+# Precompile reused headers
+target_precompile_headers(libmagnus
+  PUBLIC
+    libmagnus/include/magnus.hh
+    deps/spdlog/include/spdlog/spdlog.h
+  PRIVATE
+    <iostream>
+    <filesystem>
+    <vector>
+    <string>
+    <string_view>
+    <unordered_map>
+)
+
+# Enable some compiler/linker options.
+target_compile_options(libmagnus PRIVATE -fsanitize=address
+    -Werror -Wall -Wextra
+    -flto -fstack-protector-all
+    -fasynchronous-unwind-tables -DADDRESS_SANITIZER
+)
 target_link_options(libmagnus PRIVATE -fsanitize=address)
 
 # Magnus (frontend/cli)

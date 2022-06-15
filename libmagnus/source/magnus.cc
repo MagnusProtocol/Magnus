@@ -10,4 +10,5 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-namespace LibMagnus {}
+namespace Magnus::LibMagnus {
+}

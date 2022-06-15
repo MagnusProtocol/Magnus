@@ -2,11 +2,14 @@
 #include "compression.hh"
 #include <filesystem>
 
-namespace Magnus::Compression {
+namespace Magnus::LibMagnus::Compression {
 class LZ4 : public CompressionBase {
 private:
     std::string _buffer;
     std::string_view _input;
+
+    // Spdlog logger, multithreaded stderr
+    std::shared_ptr<spdlog::logger> _logger;
 
 public:
     LZ4(std::string_view& input);
