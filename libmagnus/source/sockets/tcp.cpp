@@ -6,6 +6,10 @@ namespace LibMagnus
     {
     }
 
+    TCPServer::TCPServer(std::string_view address) : Server(address)
+    {
+    }
+
     // void TCPServer::Run()
     // {
     //     this->Initialize();

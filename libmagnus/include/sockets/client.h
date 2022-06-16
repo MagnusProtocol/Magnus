@@ -3,7 +3,7 @@
 
 #include "socket.h"
 #include "serverinfo.h"
-#include <string>
+#include <string_view>
 
 namespace LibMagnus
 {
@@ -30,14 +30,14 @@ namespace LibMagnus
 
         ConnectionStatus GetStatus(); // Returns the connection status of the Client.
 
-        Client& SetAddress(std::string);
+        Client& SetAddress(std::string_view);
         Client& SetPort(uint16_t);
 
-        virtual Client& Connect(std::string);
-        virtual Client& Echo(std::string); // Sends the provided string to the connected server
+        virtual Client& Connect(std::string_view);
+        virtual Client& Echo(std::string_view); // Sends the provided string_view to the connected server
 
         Client();
-        Client(std::string, uint16_t); // with default server address
+        Client(std::string_view, uint16_t); // with default server address
         Client(ServerInfo);
         Client(Client&);
         Client(Client&&);

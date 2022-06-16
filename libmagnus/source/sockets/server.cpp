@@ -9,11 +9,29 @@ namespace LibMagnus
         this->Initialize();
     }
 
+    Server::Server(std::string_view& address)
+    {
+        this->Buffer.reserve(this->MaxBufferLength);
+
+        this->SetAddress(address);
+        this->Initialize();
+    }
+
+    Server& Server::SetAddress(std::string_view& address)
+    {
+        this->Address.sin_family = AF_INET;
+        this->Address.sin_addr.s_addr = inet_addr(address.data());
+        this->Address.sin_port = htons(this->Port);
+
+        this->mSocket.Bind(this->Address);
+        this->Bound = 1;
+    }
+
     Server& Server::Listen()
     {
         listen(this->mSocket.ID, this->MaxConnections);
         #ifdef LOG
-        std::cout << "Server socket listening on port " << this->Port << '\n';
+        std::cout << "Server socket listening on " << this->Address.sin_addr.s_addr << ":" << this->Address.sin_port << '\n';
         #endif
     }
 
@@ -68,6 +86,15 @@ namespace LibMagnus
 
     void Server::Run()
     {
+        if (this->Running)
+        {
+            #ifdef LOG
+            std::cout << "The server is already running." << '\n';
+            #endif
+
+            return;
+        }
+
         this->Running = 1;
 
         while (this->Running)

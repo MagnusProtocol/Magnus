@@ -3,6 +3,7 @@
 
 #include <cinttypes>
 #include <string>
+#include <string_view>
 #include "socket.h"
 
 #define LOG
@@ -40,6 +41,8 @@ namespace LibMagnus
         // Maximum length of the payload buffer
         std::string Buffer;
 
+        Server& SetAddress(std::string_view&);
+
         sockaddr_in Address; // Server address
 
         sockaddr_in ClientAddress; // Client address
@@ -51,6 +54,7 @@ namespace LibMagnus
         virtual void Run();
 
         Server();
+        Server(std::string_view&);
         Server(Server&) = default;
         Server(Server&&) = default;
         Server& operator =(Server&) = default;
@@ -58,5 +62,6 @@ namespace LibMagnus
         ~Server();
     };
 }
+
 
 #endif // SERVER_H

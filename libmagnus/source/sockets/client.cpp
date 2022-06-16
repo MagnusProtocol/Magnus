@@ -2,7 +2,7 @@
 
 namespace LibMagnus
 {
-    Client& Client::SetAddress(std::string address)
+    Client& Client::SetAddress(std::string_view address)
     {
         this->DefaultServerInfo.SetAddress(address);
 
@@ -15,7 +15,7 @@ namespace LibMagnus
 
         return *this;
     }
-    Client& Client::Connect(std::string)
+    Client& Client::Connect(std::string_view address)
     {
     }
 
@@ -27,8 +27,7 @@ namespace LibMagnus
     {
     }
 
-
-    Client& Client::Echo(std::string)
+    Client& Client::Echo(std::string_view buffer)
     {
     }
 
@@ -41,7 +40,7 @@ namespace LibMagnus
     {
     }
 
-    Client::Client(std::string address, uint16_t port)
+    Client::Client(std::string_view address, uint16_t port)
     {
         this->SetAddress(address);
         this->SetPort(port);
