@@ -38,9 +38,7 @@
 
 int main()
 {
-    LibMagnus::TCPServer tcp = LibMagnus::TCPServer();
-
-    tcp.Run();
+    LibMagnus::TCPServer tcp = LibMagnus::TCPServer("127.0.0.1");
 
     return 0;
 }

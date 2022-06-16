@@ -11,6 +11,7 @@ namespace LibMagnus
         // void Run() override;
 
         TCPServer();
+        TCPServer(std::string_view);
         TCPServer(TCPServer&) = default;
         TCPServer(TCPServer&&) = default;
         ~TCPServer();
