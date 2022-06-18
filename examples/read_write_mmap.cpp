@@ -1,6 +1,6 @@
-#include "utils.hh"
+#include "utils.hpp"
 #include <fstream>
-#include <magnus.hh>
+#include <magnus.hpp>
 
 // Magnus utility API: MMAP files.
 using namespace Magnus;

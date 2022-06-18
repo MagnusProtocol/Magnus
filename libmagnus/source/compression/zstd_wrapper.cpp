@@ -1,4 +1,4 @@
-#include "compression/zstd_wrapper.hh"
+#include "compression/zstd_wrapper.hpp"
 #include <thread>
 
 #define CHECK(cond, ...)                     \

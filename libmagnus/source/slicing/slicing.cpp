@@ -1,4 +1,4 @@
-#include "slicing/slicing.hh"
+#include "slicing/slicing.hpp"
 #include <cmath>
 #include <iostream>
 
@@ -37,9 +37,7 @@ std::vector<std::string_view> slice_into_parts(std::string_view data)
               << "Full file size: " << data.size() << std::endl
               << "Full file size reconstruction: " << (size_t)(part_size * number_of_parts) << std::endl;
 
-    for (size_t i = 0; i < number_of_parts; i++)
-    {
-
+    for (size_t i = 0; i < number_of_parts; i++) {
     }
     std::vector<std::string_view> sliced_file;
     return sliced_file;

@@ -10,15 +10,15 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Get all C++ files
 file(GLOB MAGNUS_SOURCES
-    magnus/source/*.cc
+    magnus/source/*.cpp
 )
 
 file(GLOB LIBMAGNUS_SOURCES
-    libmagnus/source/*.cc
-    libmagnus/source/compression/*.cc
-    libmagnus/source/hashing/*.cc
-    libmagnus/source/slicing/*.cc
-    libmagnus/source/utils/*.cc
+    libmagnus/source/*.cpp
+    libmagnus/source/compression/*.cpp
+    libmagnus/source/hashing/*.cpp
+    libmagnus/source/slicing/*.cpp
+    libmagnus/source/utils/*.cpp
 )
 # Don't build the zstd static libs
 set(ZSTD_BUILD_STATIC OFF)
@@ -59,7 +59,7 @@ target_link_libraries(libmagnus PUBLIC
 # Precompile reused headers
 target_precompile_headers(libmagnus
   PUBLIC
-    libmagnus/include/magnus.hh
+    libmagnus/include/magnus.hpp
     deps/spdlog/include/spdlog/spdlog.h
   PRIVATE
     <iostream>

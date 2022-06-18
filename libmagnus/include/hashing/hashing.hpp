@@ -1,5 +1,5 @@
 #pragma once
-#include "utils.hh"
+#include "utils.hpp"
 #include <iomanip>
 #include <iostream>
 #include <spdlog/spdlog.h>

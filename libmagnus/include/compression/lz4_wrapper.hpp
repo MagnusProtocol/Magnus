@@ -1,5 +1,5 @@
 #pragma once
-#include "compression.hh"
+#include "compression.hpp"
 #include <filesystem>
 
 namespace Magnus::LibMagnus::Compression {

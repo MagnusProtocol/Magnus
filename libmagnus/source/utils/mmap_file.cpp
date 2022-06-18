@@ -1,7 +1,6 @@
 #include <algorithm>
-#include <utils.hh>
 #include <iostream>
-#include <algorithm>
+#include <utils.hpp>
 
 namespace Magnus::LibMagnus::Utils {
 
@@ -12,22 +11,23 @@ namespace Magnus::LibMagnus::Utils {
  * @returns: std::tuple, first value is the mmap pointer, second value is file length.
  */
 std::tuple<void*, size_t, int> mmap_file(std::filesystem::path filepath,
-                                         int mode)
+    int mode)
 {
     int fd = 0x069,
         open_mode = 0x0;
 
     switch (mode) {
-        case MMAP_MODES::READ:
-            open_mode = O_RDONLY;
-            break;
-        case MMAP_MODES::WRITE:
-            open_mode = O_WRONLY;
-            break;
-        case MMAP_MODES::RW:
-            open_mode = O_RDWR;
-            break;
-        default: break;
+    case MMAP_MODES::READ:
+        open_mode = O_RDONLY;
+        break;
+    case MMAP_MODES::WRITE:
+        open_mode = O_WRONLY;
+        break;
+    case MMAP_MODES::RW:
+        open_mode = O_RDWR;
+        break;
+    default:
+        break;
     };
 
     fd = open(filepath.c_str(), open_mode);
@@ -56,14 +56,13 @@ std::tuple<void*, size_t, int> mmap_file(std::filesystem::path filepath,
  * @returns: std::tuple, first value is the mmap pointer, second value is file length.
  */
 std::tuple<void*, size_t, int> mmap_file(std::filesystem::path filepath,
-                                         int mode, std::string& data)
+    int mode, std::string& data)
 {
     auto file = mmap_file(filepath, mode);
 
     data = std::string(
         static_cast<const char*>(std::get<0>(file)),
-        std::get<1>(file)
-    );
+        std::get<1>(file));
 
     return file;
 }
@@ -79,8 +78,7 @@ int unmap(std::tuple<void*, size_t, int> mapped_file)
 {
     int unmap_ret = munmap(
         std::get<0>(mapped_file),
-        std::get<1>(mapped_file)
-    );
+        std::get<1>(mapped_file));
 
     if (unmap_ret != 0)
         spdlog::error("MMAP: Failed to unmap file.");
@@ -96,12 +94,11 @@ int unmap(std::tuple<void*, size_t, int> mapped_file)
  * @param dest: the string to read the file into.
  */
 void read_string(std::tuple<void*, size_t, int> mapped_file,
-                 std::string& dest)
+    std::string& dest)
 {
     dest = std::string(
         static_cast<char*>(std::get<0>(mapped_file)),
-        std::get<1>(mapped_file)
-    );
+        std::get<1>(mapped_file));
 }
 
 /*
@@ -110,14 +107,12 @@ void read_string(std::tuple<void*, size_t, int> mapped_file,
  * @param dest: the string to read the file into.
  */
 void read_string(std::tuple<void*, size_t, int> mapped_file,
-                 std::string_view& dest)
+    std::string_view& dest)
 {
     dest = std::string_view(
         static_cast<char*>(std::get<0>(mapped_file)),
-        std::get<1>(mapped_file)
-    );
+        std::get<1>(mapped_file));
 }
-
 
 /*
  * @brief: Write to mmap'ed files.
@@ -126,11 +121,12 @@ void read_string(std::tuple<void*, size_t, int> mapped_file,
  * @param data_size: The length of the data being written to the file.
  */
 void write_data(std::tuple<void*, size_t, int> mapped_file,
-                const char* data, size_t data_size)
+    const char* data, size_t data_size)
 {
     // Firstly, stretch the file to hold the string.
     if (lseek(std::get<2>(mapped_file),
-              data_size, SEEK_SET) == -1) {
+            data_size, SEEK_SET)
+        == -1) {
         spdlog::error("MMAP/WRITE Failed to strech the file.");
     }
 
@@ -139,17 +135,15 @@ void write_data(std::tuple<void*, size_t, int> mapped_file,
         spdlog::error("MMAP/WRITE: Error writing last byte of the file.");
     }
 
-//    memcpy(std::get<0>(mapped_file), data, data_size);
+    //    memcpy(std::get<0>(mapped_file), data, data_size);
     std::copy(static_cast<const char*>(data),
-              static_cast<const char*>(data) + data_size,
-              static_cast<char*>(std::get<0>(mapped_file))
-    );
+        static_cast<const char*>(data) + data_size,
+        static_cast<char*>(std::get<0>(mapped_file)));
 
     std::get<1>(mapped_file) = data_size;
 
     // Write it now to disk
-    if (msync(std::get<0>(mapped_file), data_size, MS_SYNC) == -1)
-    {
+    if (msync(std::get<0>(mapped_file), data_size, MS_SYNC) == -1) {
         spdlog::error("MMAP/WRITE: Could not sync the file to disk.");
     }
 }
@@ -160,7 +154,7 @@ void write_data(std::tuple<void*, size_t, int> mapped_file,
  * @param data: The data that is to be written to the file, here, std::string&;
  */
 void write_mmap(std::tuple<void*, size_t, int>& mapped_file,
-                std::string& data)
+    std::string& data)
 {
     write_data(mapped_file, data.data(), data.size());
 }
@@ -171,7 +165,7 @@ void write_mmap(std::tuple<void*, size_t, int>& mapped_file,
  * @param data: The data that is to be written to the file, here, std::string_view.
  */
 void write_mmap(std::tuple<void*, size_t, int>& mapped_file,
-                std::string_view& data)
+    std::string_view& data)
 {
     write_data(mapped_file, data.data(), data.size());
 }

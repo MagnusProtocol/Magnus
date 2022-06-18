@@ -1,4 +1,4 @@
-#include "compression/lz4_wrapper.hh"
+#include "compression/lz4_wrapper.hpp"
 #include <lz4.h>
 
 namespace Magnus::LibMagnus::Compression {

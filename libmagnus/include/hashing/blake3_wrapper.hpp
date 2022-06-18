@@ -1,5 +1,5 @@
 #pragma once
-#include "hashing/hashing.hh"
+#include "hashing/hashing.hpp"
 #include <blake3.h>
 #include <vector>
 

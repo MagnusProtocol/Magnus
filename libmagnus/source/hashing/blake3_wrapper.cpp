@@ -1,4 +1,4 @@
-#include "hashing/blake3_wrapper.hh"
+#include "hashing/blake3_wrapper.hpp"
 #include <array>
 #include <blake3.h>
 

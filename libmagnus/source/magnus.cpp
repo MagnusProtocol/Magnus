@@ -1,7 +1,7 @@
-#include "magnus.hh"
+#include "magnus.hpp"
+#include "utils.hpp"
 #include <filesystem>
 #include <string.h>
-#include "utils.hh"
 
 namespace Magnus::LibMagnus {
 
