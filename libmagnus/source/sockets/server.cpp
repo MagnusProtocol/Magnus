@@ -2,14 +2,14 @@
 
 namespace LibMagnus
 {
-    Server::Server()
+    Server::Server() : Bound(0), Running(0)
     {
         this->Buffer.reserve(this->MaxBufferLength);
 
         this->Initialize();
     }
 
-    Server::Server(std::string_view& address)
+    Server::Server(std::string_view& address) : AddressString(address), Bound(0), Running(0)
     {
         this->Buffer.reserve(this->MaxBufferLength);
 
@@ -25,14 +25,36 @@ namespace LibMagnus
 
         this->mSocket.Bind(this->Address);
         this->Bound = 1;
+
+        return *this;
+    }
+
+    std::string_view Server::GetAddressString()
+    {
+        return this->AddressString;
+    }
+
+    void Server::Stop()
+    {
+        #ifdef LOG
+        std::cout << "Closing the connection with ID " << this->ConnectionID << ".\n";
+        #endif
+
+        close(this->ConnectionID);
+
+        this->Running = 0;
     }
 
     Server& Server::Listen()
     {
         listen(this->mSocket.ID, this->MaxConnections);
+
+
         #ifdef LOG
         std::cout << "Server socket listening on " << this->Address.sin_addr.s_addr << ":" << this->Address.sin_port << '\n';
         #endif
+
+        return *this;
     }
 
     Server& Server::Accept()
@@ -40,6 +62,8 @@ namespace LibMagnus
         socklen_t len = sizeof(this->ClientAddress);
 
         this->ConnectionID = accept(this->mSocket.ID, (sockaddr*)&this->ClientAddress, &len);
+
+        return *this;
     }
 
     int Server::Receive()
@@ -61,11 +85,15 @@ namespace LibMagnus
         }
 
         this->Listen();
+
+        return *this;
     }
 
     Server& Server::Send(int bytes)
     {
         send(this->ConnectionID, const_cast<char*>(this->Buffer.c_str()), bytes, 0);
+
+        return *this;
     }
 
     int Server::Read()
@@ -84,7 +112,7 @@ namespace LibMagnus
         return bytes;
     }
 
-    void Server::Run()
+    void Server::Start()
     {
         if (this->Running)
         {
@@ -98,19 +126,10 @@ namespace LibMagnus
         this->Running = 1;
 
         while (this->Running)
-        {
-            this->Accept();
+            if (this->Read() > 0)
+                this->Accept();
 
-            if (this->Read() < 0) // error check; todo: log
-            {
-                #ifdef LOG
-                std::cout << "Closing the connection with ID ." << this->ConnectionID << '\n';
-                #endif
-                close(this->ConnectionID);
-
-                this->Running = 0;
-            }
-        }
+        this->Stop();
     }
 
     Server::~Server()

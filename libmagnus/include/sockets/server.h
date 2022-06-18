@@ -30,7 +30,6 @@ namespace LibMagnus
         virtual Server& Initialize();
         virtual int Receive();
         virtual int Read(); // Reads the buffer sent by client.
-
     public:
         ulong MaxBufferLength { 4096 };
 
@@ -43,15 +42,20 @@ namespace LibMagnus
 
         Server& SetAddress(std::string_view&);
 
+        std::string_view GetAddressString();
+
         sockaddr_in Address; // Server address
 
         sockaddr_in ClientAddress; // Client address
+
+        std::string_view AddressString;
 
         uint16_t Port { 3000 }; // Socket port
 
         unsigned long MaxConnections { 100 };
 
-        virtual void Run();
+        virtual void Start();
+        virtual void Stop();
 
         Server();
         Server(std::string_view&);

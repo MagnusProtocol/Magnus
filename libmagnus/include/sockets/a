@@ -1,0 +1,34 @@
+#ifndef SERVERINFO_H
+#define SERVERINFO_H
+
+#include "sockets.h"
+#include <cstring>
+#include <cinttypes>
+#include <string_view>
+
+namespace LibMagnus
+{
+    /*
+     * Stores the related server info.
+     */
+    class ServerInfo
+    {
+    private:
+        sockaddr_in Address;
+
+        uint16_t Port;
+
+    public:
+        void SetAddress();
+        void SetPort();
+
+        ServerInfo();
+        ServerInfo(std::string_view, uint16_t);
+        ServerInfo(ServerInfo&);
+        ServerInfo(ServerInfo&&);
+        ServerInfo& operator =(ServerInfo&);
+        ServerInfo& operator =(ServerInfo&&);
+    };
+}
+
+#endif //
