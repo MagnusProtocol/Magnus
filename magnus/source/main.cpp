@@ -1,21 +1,43 @@
-#include "utils.hpp"
-#include <fstream>
+#include <eccrypto.h>
+#include <ecp.h>
 #include <magnus.hpp>
+#include <osrng.h>
+#include <xed25519.h>
 
-// Magnus utility API: MMAP files.
-using namespace Magnus;
 int main()
 {
-    std::filesystem::path filepath_read = "../assets/image.jpg";
-    std::string data;
-    // Read the contents of image.jpg to data.
-    auto mapped_file_read = Magnus::LibMagnus::Utils::mmap_file(filepath_read, Magnus::LibMagnus::Utils::MMAP_MODES::READ, data);
+    using namespace CryptoPP;
+    OID CURVE = ASN1::brainpoolP512r1();
+    AutoSeededRandomPool rng;
+    ECDH<ECP>::Domain dhA(CURVE), dhB(CURVE);
 
-    // Write the data that was read back to image_mmap.jpg
-    std::filesystem::path filepath_write = "./image_mmap.jpg";
-    auto mapped_file_write = Magnus::LibMagnus::Utils::mmap_file(filepath_write, Magnus::LibMagnus::Utils::MMAP_MODES::RW);
-    Magnus::LibMagnus::Utils::write_mmap(mapped_file_write, data);
+    SecByteBlock privA(dhA.PrivateKeyLength()), pubA(dhA.PublicKeyLength());
+    SecByteBlock privB(dhB.PrivateKeyLength()), pubB(dhB.PublicKeyLength());
 
-    Magnus::LibMagnus::Utils::unmap(mapped_file_read);
-    Magnus::LibMagnus::Utils::unmap(mapped_file_write);
+    dhA.GenerateKeyPair(rng, privA, pubA);
+    dhB.GenerateKeyPair(rng, privB, pubB);
+
+    if (dhA.AgreedValueLength() != dhB.AgreedValueLength())
+        throw std::runtime_error("Shared shared size mismatch");
+
+    SecByteBlock sharedA(dhA.AgreedValueLength()), sharedB(dhB.AgreedValueLength());
+
+    if (!dhA.Agree(sharedA, privA, pubB))
+        throw std::runtime_error("Failed to reach shared secret (A)");
+
+    if (!dhB.Agree(sharedB, privB, pubA))
+        throw std::runtime_error("Failed to reach shared secret (B)");
+
+    Integer ssa, ssb;
+
+    ssa.Decode(sharedA.BytePtr(), sharedA.SizeInBytes());
+    std::cout << "(A): " << std::hex << ssa << std::endl;
+
+    ssb.Decode(sharedB.BytePtr(), sharedB.SizeInBytes());
+    std::cout << "(B): " << std::hex << ssb << std::endl;
+
+    if (ssa != ssb)
+        throw std::runtime_error("Failed to reach shared secret (C)");
+
+    std::cout << "Agreed to shared secret" << std::endl;
 }

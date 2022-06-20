@@ -4,7 +4,7 @@ project("Magnus")
 # Set C++ options
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_MACOSX_RPATH 1)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -19,6 +19,7 @@ file(GLOB LIBMAGNUS_SOURCES
     libmagnus/source/hashing/*.cpp
     libmagnus/source/slicing/*.cpp
     libmagnus/source/utils/*.cpp
+    libmagnus/source/encryption/*.cpp
 )
 # Don't build the zstd static libs
 set(ZSTD_BUILD_STATIC OFF)
@@ -39,6 +40,10 @@ add_subdirectory(deps/BLAKE3/c)
 # add spdlog
 add_subdirectory(deps/spdlog)
 
+# add cryptopp
+set(BUILD_TESTING OFF)
+set(BUILD_STATIC OFF)
+add_subdirectory(deps/cryptopp-cmake)
 # Libmagnus (backend/protocol)
 
 # Add all the sources
@@ -53,6 +58,7 @@ target_link_libraries(libmagnus PUBLIC
     blake3-shared
     libzstd_shared
     lz4_shared
+    cryptopp-shared
     spdlog
 )
 
