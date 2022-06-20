@@ -1,42 +1,22 @@
-#include <eccrypto.h>
-#include <ecp.h>
 #include <magnus.hpp>
-#include <osrng.h>
-#include <xed25519.h>
 
 int main()
 {
-    using namespace CryptoPP;
-    OID CURVE = ASN1::brainpoolP512r1();
-    AutoSeededRandomPool rng;
-    ECDH<ECP>::Domain dhA(CURVE), dhB(CURVE);
+    auto encryptA = Magnus::LibMagnus::Encryption();
+    auto keysA = encryptA.get_keys();
 
-    SecByteBlock privA(dhA.PrivateKeyLength()), pubA(dhA.PublicKeyLength());
-    SecByteBlock privB(dhB.PrivateKeyLength()), pubB(dhB.PublicKeyLength());
+    auto encryptB = Magnus::LibMagnus::Encryption();
+    auto keysB = encryptB.get_keys();
 
-    dhA.GenerateKeyPair(rng, privA, pubA);
-    dhB.GenerateKeyPair(rng, privB, pubB);
+    auto sharedA = encryptA.get_shared_key(keysB);
+    auto sharedB = encryptB.get_shared_key(keysA);
 
-    if (dhA.AgreedValueLength() != dhB.AgreedValueLength())
-        throw std::runtime_error("Shared shared size mismatch");
+    // Decode the shared secrets and print them
+    std::cout << "(A): " << std::hex << sharedA << std::endl;
+    std::cout << "(B): " << std::hex << sharedB << std::endl;
 
-    SecByteBlock sharedA(dhA.AgreedValueLength()), sharedB(dhB.AgreedValueLength());
-
-    if (!dhA.Agree(sharedA, privA, pubB))
-        throw std::runtime_error("Failed to reach shared secret (A)");
-
-    if (!dhB.Agree(sharedB, privB, pubA))
-        throw std::runtime_error("Failed to reach shared secret (B)");
-
-    Integer ssa, ssb;
-
-    ssa.Decode(sharedA.BytePtr(), sharedA.SizeInBytes());
-    std::cout << "(A): " << std::hex << ssa << std::endl;
-
-    ssb.Decode(sharedB.BytePtr(), sharedB.SizeInBytes());
-    std::cout << "(B): " << std::hex << ssb << std::endl;
-
-    if (ssa != ssb)
+    // Check if the shared secrets are actually equal
+    if (sharedA != sharedB)
         throw std::runtime_error("Failed to reach shared secret (C)");
 
     std::cout << "Agreed to shared secret" << std::endl;

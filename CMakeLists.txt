@@ -77,12 +77,12 @@ target_precompile_headers(libmagnus
 )
 
 # Enable some compiler/linker options.
-target_compile_options(libmagnus PRIVATE -fsanitize=address
+target_compile_options(libmagnus PRIVATE
     -Werror -Wall -Wextra
     -flto -fstack-protector-all
     -fasynchronous-unwind-tables -DADDRESS_SANITIZER
 )
-target_link_options(libmagnus PRIVATE -fsanitize=address)
+target_link_options(libmagnus PRIVATE)
 
 # Magnus (frontend/cli)
 add_executable(magnus ${MAGNUS_SOURCES})
