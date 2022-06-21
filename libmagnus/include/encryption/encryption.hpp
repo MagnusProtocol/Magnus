@@ -22,7 +22,7 @@ struct Keys {
     // Initialize the values
     Keys()
     {
-        dh_key = ECDH<ECP>::Domain(ASN1::brainpoolP512r1());
+        dh_key = ECDH<ECP>::Domain(ASN1::brainpoolP256r1());
         private_key.New(dh_key.PrivateKeyLength());
         public_key.New(dh_key.PublicKeyLength());
     }
@@ -39,9 +39,6 @@ private:
     // Called in every constructor, sets common values.
     void setup();
 
-    // Generate a shared key
-    SecByteBlock generate_shared_key(Keys& pKeys);
-
 public:
     /*
      * @brief: return the keys stored in the private class variable.
@@ -50,11 +47,15 @@ public:
     Keys& get_keys();
 
     /*
-     * @breif: Generate a shared key from a (sender's) private and a (reciever's) public key.
-     * @param keys: The reciever's keys.
-     * @returns: The shared key, in printable form.
+     * @breif: Decode the shared key obtained by using the generate_shared_key() function
+     * @param keys: The shared key.
+     * @returns: The shared key, as a CryptoPP::Integer.
      */
-    Integer get_shared_key(Keys& keys);
+
+    Integer decode_shared_key(SecByteBlock& shared_key);
+
+    // Generate a shared key
+    SecByteBlock generate_shared_key(Keys& pKeys);
 
     Encryption();
 

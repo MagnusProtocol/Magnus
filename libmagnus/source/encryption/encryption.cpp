@@ -41,10 +41,8 @@ SecByteBlock Encryption::generate_shared_key(Keys& pKeys)
     return mSharedKey;
 }
 
-Integer Encryption::get_shared_key(Keys& keys)
+Integer Encryption::decode_shared_key(SecByteBlock& shared_key)
 {
-    SecByteBlock shared_key = generate_shared_key(keys);
-
     Integer shared_secret;
     shared_secret.Decode(shared_key.BytePtr(), shared_key.SizeInBytes());
 
