@@ -51,14 +51,16 @@ public:
      * @param keys: The shared key.
      * @returns: The shared key, as a CryptoPP::Integer.
      */
-
     Integer decode_shared_key(SecByteBlock& shared_key);
 
     // Generate a shared key
     SecByteBlock generate_shared_key(Keys& pKeys);
 
-    Encryption();
+    // AES-256
+    byte* encrypt_data_aes_256(SecByteBlock& key, std::string& data, const CryptoPP::byte* iv);
+    byte* decrypt_data_aes_256(SecByteBlock& key, std::string& data, const CryptoPP::byte* iv);
 
+    Encryption();
     ~Encryption();
 };
 };
