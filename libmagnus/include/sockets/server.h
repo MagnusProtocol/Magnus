@@ -22,20 +22,22 @@ namespace LibMagnus
     protected:
         Socket mSocket; // Default Socket instance
 
-        uint8_t Bound; // Binding status
+        bool Bound; // Binding status
 
+        virtual Server& Bind(sockaddr_in&);
         virtual Server& Listen();
         virtual Server& Accept();
         virtual Server& Send(int);
         virtual Server& Initialize();
         virtual int Receive();
         virtual int Read(); // Reads the buffer sent by client.
+
     public:
         ulong MaxBufferLength { 4096 };
 
         uint8_t ConnectionID;
 
-        uint8_t Running;
+        bool Running;
 
         // Maximum length of the payload buffer
         std::string Buffer;

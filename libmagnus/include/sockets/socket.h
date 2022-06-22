@@ -18,11 +18,14 @@ namespace LibMagnus
     public:
         int ID;
 
-        void Bind(sockaddr_in& address);
+        sockaddr_in Address;
+
+        Socket& SetAddress(sockaddr_in&);
+        Socket& Bind(sockaddr_in&);
 
         Socket();
 
-        Socket(sockaddr_in address);
+        Socket(sockaddr_in& address);
         Socket(Socket&) = default;
         Socket(Socket&&) = default;
 

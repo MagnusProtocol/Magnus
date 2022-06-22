@@ -15,20 +15,36 @@ namespace LibMagnus
 
         return *this;
     }
+
     Client& Client::Connect(std::string_view address)
     {
+        this->SetAddress(address);
+
+        if (connect(this->mSocket.ID, (sockaddr*)&this->mSocket.Address, sizeof(mSocket.Address)) < 0)
+            #ifdef LOG
+            std::cout << "Connection failed." << '\n';
+            #endif
+
+        this->Status = ConnectionStatus::Connected;
+
+        return *this;
     }
 
-    uint8_t Client::Send()
+    std::string_view Client::Send(std::string_view buffer)
     {
+        send(this->mSocket.ID, buffer.data(), buffer.size(), 0);
+
+        if (!this->Receive())
+            #ifdef LOG
+            std::cout << "Receiving failed.\n";
+            #endif
+
+        return this->ResponseBuffer;
     }
 
     uint8_t Client::Receive()
     {
-    }
-
-    Client& Client::Echo(std::string_view buffer)
-    {
+        return recv(this->mSocket.ID, const_cast<char*>(this->ResponseBuffer.c_str()), this->BufferSize, 0);
     }
 
     ConnectionStatus Client::GetStatus()
@@ -42,8 +58,8 @@ namespace LibMagnus
 
     Client::Client(std::string_view address, uint16_t port)
     {
-        this->SetAddress(address);
         this->SetPort(port);
+        this->Connect(address);
     }
 
     Client::Client(ServerInfo serverInfo) : DefaultServerInfo(serverInfo)

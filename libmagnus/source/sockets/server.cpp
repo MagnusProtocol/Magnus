@@ -2,19 +2,46 @@
 
 namespace LibMagnus
 {
-    Server::Server() : Bound(0), Running(0)
+    Server::Server() : Bound(false), Running(false)
     {
         this->Buffer.reserve(this->MaxBufferLength);
 
         this->Initialize();
     }
 
-    Server::Server(std::string_view& address) : AddressString(address), Bound(0), Running(0)
+    Server::Server(std::string_view& address) : AddressString(address), Bound(false), Running(false)
     {
         this->Buffer.reserve(this->MaxBufferLength);
 
         this->SetAddress(address);
         this->Initialize();
+    }
+
+    Server& Server::Bind(sockaddr_in& address)
+    {
+        this->mSocket.Bind(address);
+
+        this->Bound = true;
+
+        return *this;
+    }
+
+    Server& Server::Initialize()
+    {
+        if (!this->Bound)
+        {
+            this->Address.sin_family = AF_INET;
+            this->Address.sin_addr.s_addr = htonl(INADDR_ANY);
+            this->Address.sin_port = htons(this->Port);
+
+            this->mSocket = Socket(this->Address);
+
+            this->Bound = 1;
+        }
+
+        this->Listen();
+
+        return *this;
     }
 
     Server& Server::SetAddress(std::string_view& address)
@@ -23,8 +50,7 @@ namespace LibMagnus
         this->Address.sin_addr.s_addr = inet_addr(address.data());
         this->Address.sin_port = htons(this->Port);
 
-        this->mSocket.Bind(this->Address);
-        this->Bound = 1;
+        this->Bind(this->Address);
 
         return *this;
     }
@@ -40,7 +66,7 @@ namespace LibMagnus
         std::cout << "Closing the connection with ID " << this->ConnectionID << ".\n";
         #endif
 
-        close(this->ConnectionID);
+        close(this->mSocket.ID);
 
         this->Running = 0;
     }
@@ -48,7 +74,6 @@ namespace LibMagnus
     Server& Server::Listen()
     {
         listen(this->mSocket.ID, this->MaxConnections);
-
 
         #ifdef LOG
         std::cout << "Server socket listening on " << this->Address.sin_addr.s_addr << ":" << this->Address.sin_port << '\n';
@@ -69,24 +94,6 @@ namespace LibMagnus
     int Server::Receive()
     {
         return recv(this->ConnectionID, const_cast<char*>(this->Buffer.c_str()), this->MaxBufferLength, 0);
-    }
-
-    Server& Server::Initialize()
-    {
-        if (!this->Bound)
-        {
-            this->Address.sin_family = AF_INET;
-            this->Address.sin_addr.s_addr = htonl(INADDR_ANY);
-            this->Address.sin_port = htons(this->Port);
-
-            this->mSocket = Socket(this->Address);
-
-            this->Bound = 1;
-        }
-
-        this->Listen();
-
-        return *this;
     }
 
     Server& Server::Send(int bytes)
@@ -126,8 +133,10 @@ namespace LibMagnus
         this->Running = 1;
 
         while (this->Running)
-            if (this->Read() > 0)
-                this->Accept();
+        {
+            this->Accept();
+            this->Read();
+        }
 
         this->Stop();
     }
