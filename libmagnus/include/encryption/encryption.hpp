@@ -57,10 +57,13 @@ public:
     SecByteBlock generate_shared_key(Keys& pKeys);
 
     // AES-256
-    byte* encrypt_data_aes_256(SecByteBlock& key, std::string& data, const CryptoPP::byte* iv);
-    byte* decrypt_data_aes_256(SecByteBlock& key, std::string& data, const CryptoPP::byte* iv);
+    void encrypt_data_aes_256(SecByteBlock& key, std::string& data, byte* out_data, const CryptoPP::byte* iv);
+    void decrypt_data_aes_256(SecByteBlock& key, std::string& data, byte* out_data, const CryptoPP::byte* iv);
+    void decrypt_data_aes_256(SecByteBlock& key, byte* data, size_t length, byte* out_data, const CryptoPP::byte* iv);
 
     Encryption();
     ~Encryption();
 };
+
+void string_to_byte(std::string& data, byte* data_bytes);
 };

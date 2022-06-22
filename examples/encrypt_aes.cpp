@@ -2,8 +2,12 @@
 
 int main()
 {
+
     // Text to encrypt
     std::string text = "Hello, world!";
+    std::cout << text << std::endl;
+    byte text_bytes[text.size()];
+    Magnus::LibMagnus::string_to_byte(text, text_bytes);
 
     auto encryptA = Magnus::LibMagnus::Encryption();
     auto keysA = encryptA.get_keys();
@@ -18,13 +22,18 @@ int main()
     // IV needs to be the same during both the encryption and decryption.
     SecByteBlock iv(AES::BLOCKSIZE);
 
-    byte* encrypted_text = encryptA.encrypt_data_aes_256(sharedA, text, iv);
-    byte* decrypted_text = encryptB.decrypt_data_aes_256(sharedB, encrypted_text, text.size(), iv);
+    byte encrypted_text[text.size()];
+    encryptA.encrypt_data_aes_256(sharedA, text, encrypted_text, iv);
+    std::cout << encrypted_text << std::endl;
+    byte decrypted_text[text.size()];
+    encryptB.decrypt_data_aes_256(sharedB, encrypted_text, text.length(), decrypted_text, iv);
 
-    if (
-        decrypted_text != reinterpret_cast<byte*>(text.data()) || encrypted_text != reinterpret_cast<byte*>(text.data())) {
-        throw std::runtime_error("The encryption process failed, data does not match.");
+    std::cout << decrypted_text << std::endl;
+    for (int i = 0; i < text.size(); i++) {
+        if (
+            decrypted_text[i] != text_bytes[i]) {
+            throw std::runtime_error("The encryption process failed, data does not match.");
+        }
     }
-
     std::cout << "Encryption process succeeded" << std::endl;
 }

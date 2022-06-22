@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <errno.h>
 #include <iostream>
 #include <utils.hpp>
 
@@ -43,7 +44,7 @@ std::tuple<void*, size_t, int> mmap_file(std::filesystem::path filepath,
     void* addr = nullptr;
     addr = mmap(NULL, file_size, mode, MAP_SHARED, fd, 0);
     if (addr == MAP_FAILED || addr == nullptr)
-        spdlog::error("MMAP: Failed to map {}.", filepath.string());
+        spdlog::error("MMAP: Failed to map {}. Error: {}", filepath.string(), errno);
 
     return std::make_tuple(addr, file_size, fd);
 };
