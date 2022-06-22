@@ -67,6 +67,18 @@ std::tuple<void*, size_t, int> mmap_file(std::filesystem::path filepath,
     return file;
 }
 
+std::tuple<void*, size_t, int> mmap_file(std::filesystem::path filepath,
+    int mode, std::string_view data)
+{
+    auto file = mmap_file(filepath, mode);
+
+    data = std::string_view(
+        static_cast<const char*>(std::get<0>(file)),
+        std::get<1>(file));
+
+    return file;
+}
+
 /*
  * @brief: Helper function used to unmap files and close their file descriptor after they've been used.
  * it is EXTREMELY important to call this before the end of the program,

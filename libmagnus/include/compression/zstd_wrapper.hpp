@@ -25,8 +25,8 @@ private:
     ZSTD_DCtx* _dctx;
 
     // Input & output buffers for files
-    void* _buff_in;
-    void* _buff_out;
+    void* _buff_in = nullptr;
+    void* _buff_out = nullptr;
 
     // Sizes for both the buffers
     size_t _buff_in_size;
@@ -39,7 +39,8 @@ private:
     std::shared_ptr<spdlog::logger> _logger;
 
 public:
-    ZSTD(std::string_view& input);
+    ZSTD(std::string_view input);
+    ZSTD(std::string& input);
     ZSTD(std::filesystem::path filename, int mode);
     ~ZSTD();
 

@@ -1,9 +1,9 @@
 #pragma once
-#include <sys/stat.h>
-#include <sys/mman.h>
-#include <filesystem>
 #include <fcntl.h>
+#include <filesystem>
 #include <spdlog/spdlog.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 #define SET_LOGGER(CLASS_NAME, LOGGER)                 \
@@ -16,9 +16,9 @@
 namespace Magnus::LibMagnus::Utils {
 
 enum MMAP_MODES {
-READ = PROT_READ,
-WRITE = PROT_WRITE,
-RW = PROT_READ | PROT_WRITE
+    READ = PROT_READ,
+    WRITE = PROT_WRITE,
+    RW = PROT_READ | PROT_WRITE
 };
 
 /*
@@ -34,6 +34,15 @@ std::tuple<void*, size_t, int> mmap_file(std::filesystem::path filepath, int mod
  * @param filepath: The path to the file you want to map.
  * @param mode: Mode in which you want to open forementioned file. Only use MMAP_MODES.
  * @param data: a string in which you want to store the data from the mmap'ed file.
+ * @returns: std::tuple, first value is the mmap pointer, second value is file length and the third value is the file descriptor.
+ */
+std::tuple<void*, size_t, int> mmap_file(std::filesystem::path filepath, int mode, std::string& data);
+
+/*
+ * @brief: Helper function used to map files using mmap. UNIX ONLY.
+ * @param filepath: The path to the file you want to map.
+ * @param mode: Mode in which you want to open forementioned file. Only use MMAP_MODES.
+ * @param data: a string_view in which you want to store the data from the mmap'ed file.
  * @returns: std::tuple, first value is the mmap pointer, second value is file length and the third value is the file descriptor.
  */
 std::tuple<void*, size_t, int> mmap_file(std::filesystem::path filepath, int mode, std::string& data);

@@ -22,7 +22,7 @@
     } while (0)
 
 namespace Magnus::LibMagnus::Compression {
-ZSTD::ZSTD(std::string_view& input)
+ZSTD::ZSTD(std::string_view input)
 {
     _input = input;
 
@@ -35,12 +35,21 @@ ZSTD::ZSTD(std::string_view& input)
     CHECK(_cctx != NULL, "ZSTD_createCCtx() failed!");
     ZSTD_CCtx_setParameter(_cctx, ZSTD_c_compressionLevel, 3);
     ZSTD_CCtx_setParameter(_cctx, ZSTD_c_nbWorkers, std::thread::hardware_concurrency());
+}
 
-    _buff_in = nullptr;
-    _buff_out = nullptr;
+ZSTD::ZSTD(std::string& input)
+{
+    _input = input;
 
-    _fin = nullptr;
-    _filename = nullptr;
+    // Setup spdlog
+    SET_LOGGER("ZSTD", _logger);
+
+    _cctx = ZSTD_createCCtx();
+    _dctx = ZSTD_createDCtx();
+
+    CHECK(_cctx != NULL, "ZSTD_createCCtx() failed!");
+    ZSTD_CCtx_setParameter(_cctx, ZSTD_c_compressionLevel, 3);
+    ZSTD_CCtx_setParameter(_cctx, ZSTD_c_nbWorkers, std::thread::hardware_concurrency());
 }
 
 ZSTD::ZSTD(std::filesystem::path filename, int mode)
@@ -78,9 +87,8 @@ ZSTD::~ZSTD()
     if (_buff_in != nullptr && _buff_out != nullptr) {
         free(_buff_in);
         free(_buff_out);
+        fclose(_fin);
     }
-
-    fclose(_fin);
 }
 
 /*
@@ -110,10 +118,13 @@ std::string& ZSTD::get_string()
  * */
 void ZSTD::compress_string()
 {
+    if (_input.empty() == true)
+        _logger->error("Magnus: Please use the correct constructor.");
+
     const size_t buffer_size = ZSTD_compressBound(_input.size());
     _buffer.resize(buffer_size);
 
-    size_t const c_size = ZSTD_compressCCtx(_cctx, _buffer.data(), buffer_size, _input.data(), _input.size(), 2);
+    size_t const c_size = ZSTD_compressCCtx(_cctx, _buffer.data(), buffer_size, _input.data(), _input.size(), 3);
 
     CHECK_ZSTD(c_size);
     _buffer.resize(c_size);

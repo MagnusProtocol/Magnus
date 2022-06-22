@@ -4,9 +4,11 @@ project("Magnus")
 # Set C++ options
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_MACOSX_RPATH 1)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+set(CMAKE_CXX_FLAGS "-g")
 
 # Get all C++ files
 file(GLOB MAGNUS_SOURCES
@@ -82,7 +84,6 @@ target_compile_options(libmagnus PRIVATE
     -flto -fstack-protector-all
     -fasynchronous-unwind-tables -DADDRESS_SANITIZER
 )
-target_link_options(libmagnus PRIVATE)
 
 # Magnus (frontend/cli)
 add_executable(magnus ${MAGNUS_SOURCES})
