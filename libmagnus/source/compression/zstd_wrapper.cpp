@@ -124,7 +124,7 @@ void ZSTD::compress_string()
     const size_t buffer_size = ZSTD_compressBound(_input.size());
     _buffer.resize(buffer_size);
 
-    size_t const c_size = ZSTD_compressCCtx(_cctx, _buffer.data(), buffer_size, _input.data(), _input.size(), 3);
+    size_t const c_size = ZSTD_compress2(_cctx, _buffer.data(), buffer_size, _input.data(), _input.size());
 
     CHECK_ZSTD(c_size);
     _buffer.resize(c_size);
