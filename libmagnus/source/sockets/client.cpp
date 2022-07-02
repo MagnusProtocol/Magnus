@@ -20,10 +20,52 @@ namespace LibMagnus
     {
         this->SetAddress(address);
 
-        if (connect(this->mSocket.ID, (sockaddr*)&this->mSocket.Address, sizeof(mSocket.Address)) < 0)
+        sockaddr_in* addr = this->DefaultServerInfo.GetAddress();
+
+        if (connect(this->mSocket.ID, (sockaddr*)addr, sizeof(*addr)) < 0)
+        {
             #ifdef LOG
             std::cout << "Connection failed." << '\n';
             #endif
+
+            return *this;
+        }
+
+        this->Status = ConnectionStatus::Connected;
+
+        return *this;
+    }
+
+    Client& Client::Connect(ServerInfo& serverInfo)
+    {
+        this->DefaultServerInfo = serverInfo;
+
+        if (connect(this->mSocket.ID, (sockaddr*)this->DefaultServerInfo.GetAddress(), sizeof(this->DefaultServerInfo.GetAddress())) < 0)
+        {
+            #ifdef LOG
+            std::cout << "Connection failed." << '\n';
+            #endif
+
+            return *this;
+        }
+
+        this->Status = ConnectionStatus::Connected;
+
+        return *this;
+    }
+
+    Client& Client::Connect()
+    {
+        sockaddr_in* addr = &this->DefaultServerInfo.Address;
+
+        if (connect(this->mSocket.ID, (sockaddr*)&this->DefaultServerInfo.Address, sizeof(this->DefaultServerInfo.Address)) < 0)
+        {
+            #ifdef LOG
+            perror("Connection failed");
+            #endif
+
+            return *this;
+        }
 
         this->Status = ConnectionStatus::Connected;
 
@@ -32,12 +74,23 @@ namespace LibMagnus
 
     std::string_view Client::Send(std::string_view buffer)
     {
-        send(this->mSocket.ID, buffer.data(), buffer.size(), 0);
+        if (this->Status != ConnectionStatus::Connected)
+            this->Connect();
+
+        if (send(this->mSocket.ID, buffer.data(), buffer.size(), 0) < 0)
+        {
+            # ifdef LOG
+            std::cout << "Buffer sending failed.";
+            #endif
+
+            return this->ResponseBuffer;
+        }
 
         if (!this->Receive())
             #ifdef LOG
             std::cout << "Receiving failed.\n";
             #endif
+
 
         return this->ResponseBuffer;
     }
@@ -58,8 +111,9 @@ namespace LibMagnus
 
     Client::Client(std::string_view address, uint16_t port)
     {
+        this->SetAddress(address);
         this->SetPort(port);
-        this->Connect(address);
+        this->Connect();
     }
 
     Client::Client(ServerInfo serverInfo) : DefaultServerInfo(serverInfo)
@@ -80,16 +134,16 @@ namespace LibMagnus
 
     Client& Client::operator =(Client& client)
     {
-        Client c;
+        Client _client;
 
-        return (c = Client(client));
+        return (_client = Client(client));
     }
 
     Client& Client::operator =(Client&& client)
     {
-        Client c;
+        Client _client;
 
-        return (c = Client(client));
+        return (_client = Client(client));
     }
 
     Client::~Client()

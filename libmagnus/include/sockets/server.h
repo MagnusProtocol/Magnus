@@ -44,6 +44,8 @@ namespace LibMagnus
 
         Server& SetAddress(std::string_view&);
 
+        Server& SetBufferSize(ulong);
+
         std::string_view GetAddressString();
 
         sockaddr_in Address; // Server address

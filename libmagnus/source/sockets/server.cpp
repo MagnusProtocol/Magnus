@@ -93,12 +93,24 @@ namespace LibMagnus
 
     int Server::Receive()
     {
-        return recv(this->ConnectionID, const_cast<char*>(this->Buffer.c_str()), this->MaxBufferLength, 0);
+        // memset(this->Buffer.data(), 0, this->MaxBufferLength + 1);
+        this->Buffer.clear();
+
+        return recv(this->ConnectionID, this->Buffer.data(), this->MaxBufferLength, 0);
     }
 
     Server& Server::Send(int bytes)
     {
-        send(this->ConnectionID, const_cast<char*>(this->Buffer.c_str()), bytes, 0);
+        send(this->ConnectionID, this->Buffer.data(), bytes, 0);
+
+        return *this;
+    }
+
+    Server& Server::SetBufferSize(ulong size)
+    {
+        this->MaxBufferLength = size;
+
+        this->Buffer.resize(size);
 
         return *this;
     }
@@ -110,10 +122,10 @@ namespace LibMagnus
         while ((bytes = this->Receive()) > 0)
         {
             #ifdef LOG
-            std::cout << "Recieved buffer: " << this->Buffer << '\n';
+            std::cout << "Recieved buffer: " << this->Buffer.c_str() << '\n';
             #endif
 
-            this->Send(bytes);
+            this->Send(bytes + 1);
         }
 
         return bytes;
