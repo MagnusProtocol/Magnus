@@ -22,158 +22,145 @@
     } while (0)
 
 namespace Magnus::LibMagnus::Compression {
-ZSTD::ZSTD(std::string_view input)
+
+// Common setup function for all the class constructors
+void ZSTD::setup()
 {
-    _input = input;
-
     // Setup spdlog
-    SET_LOGGER("ZSTD", _logger);
+    SET_LOGGER("ZSTD", mLogger);
 
-    _cctx = ZSTD_createCCtx();
-    _dctx = ZSTD_createDCtx();
+    mCctx = ZSTD_createCCtx();
+    mDctx = ZSTD_createDCtx();
 
-    CHECK(_cctx != NULL, "ZSTD_createCCtx() failed!");
-    ZSTD_CCtx_setParameter(_cctx, ZSTD_c_compressionLevel, 3);
-    ZSTD_CCtx_setParameter(_cctx, ZSTD_c_nbWorkers, std::thread::hardware_concurrency());
+    CHECK(mCctx != NULL, "ZSTD_createCCtx() failed!");
+    // ZSTD_CCtx_setParameter(mCctx, ZSTD_c_compressionLevel, 3);
+    ZSTD_CCtx_setParameter(mCctx, ZSTD_c_nbWorkers, std::thread::hardware_concurrency());
 }
 
-ZSTD::ZSTD(std::string& input)
+/*
+ * @brief: Compress/Decompress a std::string_view; to obtain the result of this function, call the applicable getter function.
+ * @param input: the string_view to be compressed/decompressed
+ * @param mode: To compress or to decompress, that is the question.
+ */
+ZSTD::ZSTD(std::string_view input, MODES mode)
 {
-    _input = input;
+    mInput = input;
 
-    // Setup spdlog
-    SET_LOGGER("ZSTD", _logger);
-
-    _cctx = ZSTD_createCCtx();
-    _dctx = ZSTD_createDCtx();
-
-    CHECK(_cctx != NULL, "ZSTD_createCCtx() failed!");
-    ZSTD_CCtx_setParameter(_cctx, ZSTD_c_compressionLevel, 3);
-    ZSTD_CCtx_setParameter(_cctx, ZSTD_c_nbWorkers, std::thread::hardware_concurrency());
-}
-
-ZSTD::ZSTD(std::filesystem::path filename, int mode)
-{
-    // Setup spdlog
-    SET_LOGGER("ZSTD", _logger);
-
-    _fin = fopen(filename.c_str(), "rb");
-
-    _cctx = ZSTD_createCCtx();
-    _dctx = ZSTD_createDCtx();
-
-    CHECK(_cctx != NULL, "ZSTD_createCCtx() failed!");
-    ZSTD_CCtx_setParameter(_cctx, ZSTD_c_compressionLevel, 3);
-    ZSTD_CCtx_setParameter(_cctx, ZSTD_c_nbWorkers, std::thread::hardware_concurrency());
+    setup();
 
     if (mode == MODES::COMPRESS) {
-        _buff_in_size = ZSTD_CStreamInSize();
-        _buff_out_size = ZSTD_CStreamOutSize();
+        compress_string();
     } else {
-        _buff_in_size = ZSTD_DStreamInSize();
-        _buff_out_size = ZSTD_DStreamOutSize();
+        decompress_string();
     }
-
-    _buff_in = malloc(_buff_in_size);
-    _buff_out = malloc(_buff_out_size);
 }
 
+/*
+ * @brief: Compress/Decompress a std::string_view; to obtain the result of this function, call the applicable getter function.
+ * @param input: the string to be compressed/decompressed
+ * @param mode: To compress or to decompress, that is the question.
+ */
+ZSTD::ZSTD(std::string& input, MODES mode)
+{
+    mInput = input;
+
+    setup();
+
+    if (mode == MODES::COMPRESS) {
+        compress_string();
+    } else {
+        decompress_string();
+    }
+}
+
+/*
+ * @brief: Compress/Decompress file; to obtain the result of this function, call the applicable getter function.
+ * @param filename: Path to the file on which the operation has to be performed
+ * @param mode: To compress or to decompress, that is the question.
+ */
+ZSTD::ZSTD(std::filesystem::path filename, MODES mode)
+{
+    mFin = fopen(filename.c_str(), "rb");
+
+    setup();
+
+    if (mode == MODES::COMPRESS) {
+        mBuffInSize = ZSTD_CStreamInSize();
+        mBuffOutSize = ZSTD_CStreamOutSize();
+
+        mBuffIn = malloc(mBuffInSize);
+        mBuffOut = malloc(mBuffOutSize);
+
+        compress_file();
+    } else {
+        mBuffInSize = ZSTD_DStreamInSize();
+        mBuffOutSize = ZSTD_DStreamOutSize();
+
+        mBuffIn = malloc(mBuffInSize);
+        mBuffOut = malloc(mBuffOutSize);
+
+        decompress_file();
+    }
+}
+
+/*
+ * @brief: Class destructor, does all the cleanup
+ */
 ZSTD::~ZSTD()
 {
 
-    ZSTD_freeCCtx(_cctx);
-    ZSTD_freeDCtx(_dctx);
+    ZSTD_freeCCtx(mCctx);
+    ZSTD_freeDCtx(mDctx);
 
-    if (_buff_in != nullptr && _buff_out != nullptr) {
-        free(_buff_in);
-        free(_buff_out);
-        fclose(_fin);
+    if (mBuffIn != nullptr && mBuffOut != nullptr) {
+        free(mBuffIn);
+        free(mBuffOut);
+        fclose(mFin);
     }
 }
 
 /*
- * @brief: This is a getter method to get the compressed/decompressed as a std::string_view.
- * */
-std::string_view ZSTD::get_string_view()
-{
-    if (_buffer.empty()) {
-        _logger->error("ZSTD: There isn't any buffer to return.");
-    }
-    return std::string_view(_buffer);
-}
-
-/*
- * @brief: This is a getter method to get the compressed/decompressed std::string&.
- * */
-// TODO: Fix strings
-std::string& ZSTD::get_string()
-{
-    if (_buffer.empty()) {
-        _logger->error("ZSTD: There isn't any buffer to return.");
-    }
-    return _buffer;
-}
-/*
- *  @brief: This method uses the string set by the ZSTD string constructor and decompresses it.
- * */
+ * @brief: Internal function to compress the string in the local variable _input.
+ */
 void ZSTD::compress_string()
 {
-    if (_input.empty() == true)
-        _logger->error("Magnus: Please use the correct constructor.");
+    if (mInput.empty() == true) {
+        mLogger->error("Magnus: Please use the correct constructor.");
+        throw std::exception();
+    }
 
-    const size_t buffer_size = ZSTD_compressBound(_input.size());
-    _buffer.resize(buffer_size);
+    const size_t buffer_size = ZSTD_compressBound(mInput.size());
+    mBuffer.resize(buffer_size);
 
-    size_t const c_size = ZSTD_compress2(_cctx, _buffer.data(), buffer_size, _input.data(), _input.size());
+    size_t const c_size = ZSTD_compressCCtx(mCctx, mBuffer.data(), buffer_size, mInput.data(), mInput.size(), 3);
 
     CHECK_ZSTD(c_size);
-    _buffer.resize(c_size);
+    mBuffer.resize(c_size);
 }
 
 /*
- * @brief: This method uses the string set by the ZSTD string constructor and decompresses it.
- * */
-void ZSTD::decompress_string()
-{
-    if (_input.empty() == true)
-        _logger->error("Magnus: Please use the correct constructor.");
-
-    unsigned long long const r_size = ZSTD_getFrameContentSize(_input.data(), _input.size());
-    CHECK(r_size != ZSTD_CONTENTSIZE_ERROR, "ZSTD: Not compressed by zstd!");
-    CHECK(r_size != ZSTD_CONTENTSIZE_UNKNOWN, "ZSTD: Original size unknown!");
-
-    _buffer.resize(size_t(r_size));
-    size_t const d_size = ZSTD_decompressDCtx(_dctx, _buffer.data(), r_size, _input.data(), _input.size());
-
-    // When zstd knows the content size, it will error if it doesn't match.
-    CHECK_ZSTD(d_size);
-    CHECK(d_size == r_size, "Size does not match!");
-}
-
-/*
- * @brief: This method takes the file provided in the filesystem::path constructor and compresses it.
- * It stores the result in a string which can be accessed via the getter functions.
- * */
+ * @brief: Internal function to compress a file which had been opened in the constructor.
+ */
 void ZSTD::compress_file()
 {
 
-    size_t const to_read = _buff_in_size;
+    size_t const to_read = mBuffInSize;
     for (;;) {
-        size_t read = fread(_buff_in, 1, to_read, _fin);
+        size_t read = fread(mBuffIn, 1, to_read, mFin);
 
         int const last_chunk = (read < to_read);
         ZSTD_EndDirective const mode = last_chunk ? ZSTD_e_end : ZSTD_e_continue;
 
-        ZSTD_inBuffer input = { _buff_in, read, 0 };
+        ZSTD_inBuffer input = { mBuffIn, read, 0 };
 
         int finished;
         do {
 
-            ZSTD_outBuffer output = { _buff_out, _buff_out_size, 0 };
-            size_t const remaining = ZSTD_compressStream2(_cctx, &output, &input, mode);
+            ZSTD_outBuffer output = { mBuffOut, mBuffOutSize, 0 };
+            size_t const remaining = ZSTD_compressStream2(mCctx, &output, &input, mode);
 
             CHECK_ZSTD(remaining);
-            _buffer.append((char*)_buff_out, output.pos);
+            mBuffer.append((char*)mBuffOut, output.pos);
 
             finished = last_chunk ? (remaining == 0) : (input.pos == input.size);
         } while (!finished);
@@ -187,41 +174,73 @@ void ZSTD::compress_file()
     }
 }
 
+/*
+ * @brief: Internal function to decompress the string in the local variable _input.
+ */
+void ZSTD::decompress_string()
+{
+    if (mInput.empty() == true) {
+        mLogger->error("Magnus: Please use the correct constructor.");
+        throw std::exception();
+    }
+    unsigned long long const r_size = ZSTD_getFrameContentSize(mInput.data(), mInput.size());
+    CHECK(r_size != ZSTD_CONTENTSIZE_ERROR, "ZSTD: Not compressed by zstd!");
+    CHECK(r_size != ZSTD_CONTENTSIZE_UNKNOWN, "ZSTD: Original size unknown!");
+
+    mBuffer.resize(size_t(r_size));
+    size_t const d_size = ZSTD_decompress(mBuffer.data(), r_size, mInput.data(), mInput.size());
+
+    // When zstd knows the content size, it will error if it doesn't match.
+    CHECK_ZSTD(d_size);
+    CHECK(d_size == r_size, "Size does not match!");
+}
+
+/*
+ * @brief: Internal function to decompress a file which had been opened in the constructor.
+ */
 void ZSTD::decompress_file()
 {
-    /* This loop assumes that the input file is one or more concatenated zstd
-     * streams. This example won't work if there is trailing non-zstd data at
-     * the end, but streaming decompression in general handles this case.
-     * ZSTD_decompressStream() returns 0 exactly when the frame is completed,
-     * and doesn't consume input after the frame.
-     */
-    size_t const toRead = _buff_in_size;
+    size_t const toRead = mBuffInSize;
     size_t read;
-    // size_t lastRet = 0;
-    // int isEmpty = 1;
-    while ((read = fread(_buff_in, 1, toRead, _fin))) {
-        // isEmpty = 0;
-        ZSTD_inBuffer input = { _buff_in, read, 0 };
-        /* Given a valid frame, zstd won't consume the last byte of the frame
-         * until it has flushed all of the decompressed data of the frame.
-         * Therefore, instead of checking if the return code is 0, we can
-         * decompress just check if input.pos < input.size.
-         */
+
+    while ((read = fread(mBuffIn, 1, toRead, mFin))) {
+
+        ZSTD_inBuffer input = { mBuffIn, read, 0 };
+
         while (input.pos < input.size) {
-            ZSTD_outBuffer output = { _buff_out, _buff_out_size, 0 };
-            /* The return code is zero if the frame is complete, but there may
-             * be multiple frames concatenated together. Zstd will automatically
-             * reset the context when a frame is complete. Still, calling
-             * ZSTD_DCtx_reset() can be useful to reset the context to a clean
-             * state, for instance if the last decompression call returned an
-             * error.
-             */
-            size_t const ret = ZSTD_decompressStream(_dctx, &output, &input);
+            ZSTD_outBuffer output = { mBuffOut, mBuffOutSize, 0 };
+
+            size_t const ret = ZSTD_decompressStream(mDctx, &output, &input);
             CHECK_ZSTD(ret);
-            _buffer.append(static_cast<const char*>(_buff_out), output.pos);
-            // lastRet = ret;
+            mBuffer.append(static_cast<const char*>(mBuffOut), output.pos);
         }
     }
 }
 
+/*
+ * @brief: Getter function for the result of the operations
+ * @returns: The result of the compression/decompression as a std::string_view
+ */
+std::string_view ZSTD::get_string_view()
+{
+    if (mBuffer.empty()) {
+        mLogger->error("ZSTD: There isn't any buffer to return.");
+        throw std::exception();
+    }
+    return std::string_view(mBuffer);
+}
+
+/*
+ * @brief: Getter function for the result of the operations
+ * @returns: The result of the compression/decompression as a std::string
+ */
+std::string& ZSTD::get_string()
+{
+    if (mBuffer.empty()) {
+        mLogger->error("ZSTD: There isn't any buffer to return.");
+        throw std::exception();
+    }
+
+    return mBuffer;
+}
 }

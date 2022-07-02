@@ -6,11 +6,18 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#define SET_LOGGER(CLASS_NAME, LOGGER)                 \
-    if (spdlog::get(CLASS_NAME) == nullptr) {          \
-        _logger = spdlog::stderr_color_mt(CLASS_NAME); \
-    } else {                                           \
-        _logger = spdlog::get(CLASS_NAME);             \
+#include "spdlog/details/log_msg.h"
+#include "spdlog/details/null_mutex.h"
+
+#include <memory>
+#include <mutex>
+#include <string>
+
+#define SET_LOGGER(CLASS_NAME, LOGGER)                \
+    if (spdlog::get(CLASS_NAME) == nullptr) {         \
+        LOGGER = spdlog::stderr_color_mt(CLASS_NAME); \
+    } else {                                          \
+        LOGGER = spdlog::get(CLASS_NAME);             \
     }
 
 namespace Magnus::LibMagnus::Utils {
@@ -68,7 +75,7 @@ void write_mmap(std::tuple<void*, size_t, int>& mapped_file, std::string& data);
  * @param file: This should be the value returned by the provided mmap_file function.
  * @param data: The data that is to be written to the file, here, std::string_view.
  */
-void write_mmap(std::tuple<void*, size_t, int>& mapped_file, std::string_view& data);
+void write_mmap(std::tuple<void*, size_t, int>& mapped_file, std::string_view data);
 
 /*
  * @brief: Write to mmap'ed files.

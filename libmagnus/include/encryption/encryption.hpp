@@ -47,7 +47,7 @@ public:
     Keys& get_keys();
 
     /*
-     * @breif: Decode the shared key obtained by using the generate_shared_key() function
+     * @brief: Decode the shared key obtained by using the generate_shared_key() function
      * @param keys: The shared key.
      * @returns: The shared key, as a CryptoPP::Integer.
      */
