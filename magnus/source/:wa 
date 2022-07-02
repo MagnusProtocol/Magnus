@@ -1,0 +1,28 @@
+#include <cmath>
+#include <magnus.h>
+
+
+#include "sockets/tcp.h"
+#include "sockets/client.h"
+#include "sys/sysinfo.h"
+#include "sys/types.h"
+#include <compression/lz4_wrapper.hh>
+#include <future>
+#include <iostream>
+
+int main()
+{
+    std::async(std::launch::async, []() {
+            LibMagnus::TCPServer tcp = LibMagnus::TCPServer("192.168.1.6");
+
+            tcp.SetBufferSize(1024000);
+            tcp.Start();
+        }
+    );
+
+    LibMagnus::Client client = LibMagnus::Client("127.0.0.1", 3000);
+
+    std::cout << client.Send("lol") << '\n';
+
+    return 0;
+}

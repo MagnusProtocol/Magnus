@@ -35,6 +35,7 @@ namespace LibMagnus
         uint64_t BufferSize { 4096 };
 
         virtual uint8_t Receive();
+
     public:
         ServerInfo DefaultServerInfo;
 
@@ -44,7 +45,9 @@ namespace LibMagnus
         Client& SetAddress(std::string_view);
         Client& SetPort(uint16_t);
 
+        virtual Client& Connect();
         virtual Client& Connect(std::string_view);
+        virtual Client& Connect(ServerInfo&);
         virtual std::string_view Send(std::string_view); // Sends the provided string_view to the connected server
 
         Client();

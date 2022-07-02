@@ -12,24 +12,28 @@ namespace LibMagnus
     /*
      * Stores the related server info.
      */
-    class ServerInfo
+    struct ServerInfo
     {
-    private:
+    public:
         sockaddr_in Address;
 
         uint16_t Port;
 
-    public:
         void SetAddress(std::string_view);
         void SetAddress(sockaddr_in);
         void SetPort(uint16_t);
+
+        sockaddr_in* GetAddress();
+        uint16_t GetPort();
 
         ServerInfo();
         ServerInfo(std::string_view, uint16_t);
         ServerInfo(const ServerInfo&);
         ServerInfo(const ServerInfo&&);
-        ServerInfo& operator =(ServerInfo&);
-        ServerInfo& operator =(ServerInfo&&);
+
+        ServerInfo& operator =(const ServerInfo&);
+        ServerInfo& operator =(const ServerInfo&&);
+
         ~ServerInfo();
     };
 }

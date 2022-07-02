@@ -1,7 +1,6 @@
 #include <cmath>
 #include <magnus.h>
 
-
 #include "sockets/tcp.h"
 #include "sockets/client.h"
 #include "sys/sysinfo.h"
@@ -10,38 +9,28 @@
 #include <future>
 #include <iostream>
 
-// int main()
-// {
-//     LibMagnus::Magnus new_magnus("/home/steve/Pictures/Wallpapers/Grass.jpg");
-//     auto data = new_magnus.get_data();
-
-//     // Compression
-//     std::ofstream stream_compression("compressed.jpg.zst", std::ios::out | std::ios::binary);
-//     auto lz4_compressor = LZ4(data);
-
-//     lz4_compressor.compress();
-
-//     stream_compression.write(
-//         lz4_compressor.get_string()->data(),
-//         lz4_compressor.get_string()->size());
-
-//     // Decompression
-//     std::ofstream stream_decompression("decompressed.jpg", std::ios::out | std::ios::binary);
-
-//     auto compressed_string = lz4_compressor.get_string_view();
-//     auto LZ4_decompressor = LZ4(compressed_string);
-
-//     LZ4_decompressor.decompress();
-
-//     stream_decompression.write(
-//         LZ4_decompressor.get_string()->data(),
-//         LZ4_decompressor.get_string()->size());
-// }
-
-int main()
+int main(int argc, char** argv)
 {
-    std::async(std::launch::async, [](){ LibMagnus::TCPServer tcp = LibMagnus::TCPServer("127.0.0.1"); tcp.Start();} );
-    std::async(std::launch::async, [](){ LibMagnus::Client client = LibMagnus::Client("127.0.0.1", 3000); std::cout << client.Send("lol") << '\n'; } );
+    auto f = std::async(std::launch::async, []() {
+         LibMagnus::TCPServer tcp = LibMagnus::TCPServer("127.0.0.1");
+
+         tcp.SetBufferSize(1024000);
+         tcp.Start();
+        }
+
+
+  );
+
+    f.get();
+
+    std::future<void> f1 = std::async(std::launch::async, [argv]() {
+        LibMagnus::Client client = LibMagnus::Client("127.0.0.1", 3000);
+
+        while (1)
+            std::cout << client.Send(argv[1]) << '\n';
+    });
+
+    f1.get();
 
     return 0;
 }
