@@ -4,6 +4,8 @@
 #include <cinttypes>
 #include <string>
 #include <string_view>
+#include <deque>
+#include <string_view>
 #include "socket.h"
 
 #define LOG
@@ -41,6 +43,8 @@ namespace LibMagnus
 
         // Maximum length of the payload buffer
         std::string Buffer;
+
+        std::deque<std::string_view> BufferStack;
 
         Server& SetAddress(std::string_view&);
 

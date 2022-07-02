@@ -122,9 +122,10 @@ namespace LibMagnus
         while ((bytes = this->Receive()) > 0)
         {
             #ifdef LOG
-            std::cout << "Recieved buffer: " << this->Buffer.c_str() << '\n';
+            std::cout << "Recieved buffer: " << this->Buffer.c_str() << '\n'
+                << "Stack Size: " << this->BufferStack.size() << '\n';
             #endif
-
+            this->BufferStack.push_back(this->Buffer);
             this->Send(bytes + 1);
         }
 
