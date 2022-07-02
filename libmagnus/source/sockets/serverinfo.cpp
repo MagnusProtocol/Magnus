@@ -14,7 +14,7 @@ namespace LibMagnus
     {
         memset(&this->Address, 0, sizeof(this->Address));
 
-        this->sinamily = address.sin_family;
+        this->Address.sin_family = address.sin_family;
         this->Address.sin_addr.s_addr = address.sin_addr.s_addr;
     }
 
