@@ -5,11 +5,12 @@
 #include <slicing/slicing.hpp>
 #include <encryption/encryption.hpp>
 
-namespace LibMagnus {
-class Magnus {
-private:
-public:
-    Magnus();
-    ~Magnus();
-};
+namespace LibMagnus
+{
+    class Magnus
+    {
+    public:
+        Magnus();
+        ~Magnus();
+    };
 }

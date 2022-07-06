@@ -15,6 +15,7 @@ file(GLOB MAGNUS_SOURCES
 
 file(GLOB LIBMAGNUS_SOURCES
     libmagnus/source/*.cpp
+    libmagnus/source/sockets/*.cpp
     libmagnus/source/compression/*.cpp
     libmagnus/source/hashing/*.cpp
     libmagnus/source/slicing/*.cpp
@@ -43,6 +44,7 @@ add_subdirectory(deps/spdlog)
 # add cryptopp
 set(BUILD_TESTING OFF)
 set(BUILD_STATIC OFF)
+
 add_subdirectory(deps/cryptopp-cmake)
 # Libmagnus (backend/protocol)
 
@@ -78,9 +80,7 @@ target_precompile_headers(libmagnus
 
 # Enable some compiler/linker options.
 target_compile_options(libmagnus PRIVATE
-    -Werror -Wall -Wextra
-    -flto -fstack-protector-all
-    -fasynchronous-unwind-tables -DADDRESS_SANITIZER
+    -Wall -DADDRESS_SANITIZER
 )
 
 # Magnus (frontend/cli)

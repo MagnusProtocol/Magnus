@@ -1,8 +1,21 @@
 #include "magnus.hpp"
-#include "utils.hpp"
 #include <filesystem>
 #include <string.h>
 
-namespace Magnus::LibMagnus {
+// For mmap
+#include <cstring>
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
+namespace LibMagnus
+{
+    Magnus::Magnus()
+    {
+    }
+
+    Magnus::~Magnus()
+    {
+    }
 }
