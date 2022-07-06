@@ -48,15 +48,15 @@ namespace LibMagnus
         virtual Client& Connect();
         virtual Client& Connect(std::string_view);
         virtual Client& Connect(ServerInfo&);
-        virtual std::string_view Send(std::string_view); // Sends the provided string_view to the connected server
+        virtual std::string_view Send(std::string_view); // Sends the pro:vided string_view to the connected server
 
         Client();
         Client(std::string_view, uint16_t); // with default server address
         Client(ServerInfo);
         Client(Client&);
         Client(Client&&);
-        Client& operator =(Client&);
-        Client& operator =(Client&&);
+        Client& operator =(Client&) noexcept;
+        Client& operator =(Client&&) noexcept;
         ~Client();
     };
 }

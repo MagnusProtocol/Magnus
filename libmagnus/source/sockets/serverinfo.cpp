@@ -52,7 +52,7 @@ namespace LibMagnus
         this->SetPort(serverInfo.Port);
     }
 
-    ServerInfo::ServerInfo(const ServerInfo&& serverInfo)
+    ServerInfo::ServerInfo(ServerInfo&& serverInfo)
     {
         this->Address.sin_family = std::move(serverInfo.Address.sin_family);
         this->Address.sin_addr.s_addr = std::move(serverInfo.Address.sin_addr.s_addr);
@@ -61,14 +61,14 @@ namespace LibMagnus
         this->Port = std::move(serverInfo.Port);
     }
 
-    ServerInfo& ServerInfo::operator =(const ServerInfo& serverInfo)
+    ServerInfo& ServerInfo::operator =(const ServerInfo& serverInfo) noexcept
     {
         ServerInfo _serverInfo;
 
         return (_serverInfo = ServerInfo(serverInfo));
     }
 
-    ServerInfo& ServerInfo::operator =(const ServerInfo&& serverInfo)
+    ServerInfo& ServerInfo::operator =(ServerInfo&& serverInfo) noexcept
     {
         ServerInfo _serverInfo;
 

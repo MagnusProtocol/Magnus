@@ -56,8 +56,6 @@ namespace LibMagnus
 
     Client& Client::Connect()
     {
-        sockaddr_in* addr = &this->DefaultServerInfo.Address;
-
         if (connect(this->mSocket.ID, (sockaddr*)&this->DefaultServerInfo.Address, sizeof(this->DefaultServerInfo.Address)) < 0)
         {
             #ifdef LOG
@@ -132,14 +130,14 @@ namespace LibMagnus
     {
     }
 
-    Client& Client::operator =(Client& client)
+    Client& Client::operator =(Client& client) noexcept
     {
         Client _client;
 
         return (_client = Client(client));
     }
 
-    Client& Client::operator =(Client&& client)
+    Client& Client::operator =(Client&& client) noexcept
     {
         Client _client;
 

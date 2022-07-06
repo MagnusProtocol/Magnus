@@ -56,7 +56,7 @@ namespace LibMagnus
 
         sockaddr_in ClientAddress; // Client address
 
-        std::string_view AddressString;
+        std::string_view AddressString {};
 
         uint16_t Port { 3000 }; // Socket port
 
@@ -69,7 +69,7 @@ namespace LibMagnus
         Server(std::string_view&);
         Server(Server&) = default;
         Server(Server&&) = default;
-        Server& operator =(Server&) = default;
+        Server& operator =(const Server&) = default;
         Server& operator =(Server&&) = default;
         ~Server();
     };

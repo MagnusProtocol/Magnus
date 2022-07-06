@@ -80,9 +80,7 @@ target_precompile_headers(libmagnus
 
 # Enable some compiler/linker options.
 target_compile_options(libmagnus PRIVATE
-    -Werror -Wall -Wextra
-    -flto -fstack-protector-all
-    -fasynchronous-unwind-tables -DADDRESS_SANITIZER
+    -Wall -DADDRESS_SANITIZER
 )
 
 # Magnus (frontend/cli)

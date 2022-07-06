@@ -9,7 +9,7 @@ namespace LibMagnus
         this->Initialize();
     }
 
-    Server::Server(std::string_view& address) : AddressString(address), Bound(false), Running(false)
+    Server::Server(std::string_view& address) : Bound(false), Running(false), AddressString(address)
     {
         this->Buffer.reserve(this->MaxBufferLength);
 

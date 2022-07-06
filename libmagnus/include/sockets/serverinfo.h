@@ -29,10 +29,10 @@ namespace LibMagnus
         ServerInfo();
         ServerInfo(std::string_view, uint16_t);
         ServerInfo(const ServerInfo&);
-        ServerInfo(const ServerInfo&&);
+        ServerInfo(ServerInfo&&);
 
-        ServerInfo& operator =(const ServerInfo&);
-        ServerInfo& operator =(const ServerInfo&&);
+        ServerInfo& operator =(const ServerInfo&) noexcept;
+        ServerInfo& operator =(ServerInfo&&) noexcept;
 
         ~ServerInfo();
     };
