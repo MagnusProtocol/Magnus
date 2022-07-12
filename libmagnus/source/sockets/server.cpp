@@ -93,7 +93,6 @@ namespace LibMagnus
 
     int Server::Receive()
     {
-        // memset(this->Buffer.data(), 0, this->MaxBufferLength + 1);
         this->Buffer.clear();
 
         return recv(this->ConnectionID, this->Buffer.data(), this->MaxBufferLength, 0);
@@ -101,7 +100,10 @@ namespace LibMagnus
 
     Server& Server::Send(int bytes)
     {
-        send(this->ConnectionID, this->Buffer.data(), bytes, 0);
+        if (send(this->ConnectionID, this->Buffer.data(), bytes, 0) < 0)
+            #ifdef DEBUG
+            std::cout << "Server response failure.";
+            #endif
 
         return *this;
     }
@@ -145,9 +147,10 @@ namespace LibMagnus
 
         this->Running = 1;
 
+        this->Accept();
+
         while (this->Running)
         {
-            this->Accept();
             this->Read();
         }
 

@@ -1,10 +1,16 @@
 #include <fstream>
 #include <magnus.hpp>
+#include "sockets/tcp.h"
 #include <iostream>
+
+using namespace LibMagnus;
 
 int main()
 {
-    std::cout << "Hello, Magnus." << std::endl;
+    TCPServer server = TCPServer("127.0.0.1");
+
+    server.Start();
+
     return 0;
 }
 
