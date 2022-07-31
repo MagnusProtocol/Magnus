@@ -1,38 +1,37 @@
-#include "sockets/socket.h"
+#include "sockets/socket.hpp"
 
-namespace LibMagnus
+namespace LibMagnus {
+Socket::Socket()
 {
-    Socket::Socket()
-    {
-        this->ID = socket(AF_INET, SOCK_STREAM, 0);
-    }
+    this->ID = socket(AF_INET, SOCK_STREAM, 0);
+}
 
-    Socket::Socket(sockaddr_in& address)
-    {
-        this->Bind(address);
+Socket::Socket(sockaddr_in& address)
+{
+    this->Bind(address);
 
-        this->SetAddress(address);
-    }
+    this->SetAddress(address);
+}
 
-    Socket& Socket::SetAddress(sockaddr_in& address)
-    {
-        this->Address.sin_family = address.sin_family;
-        this->Address.sin_addr.s_addr = address.sin_addr.s_addr;
-        this->Address.sin_port = address.sin_port;
+Socket& Socket::SetAddress(sockaddr_in& address)
+{
+    this->Address.sin_family = address.sin_family;
+    this->Address.sin_addr.s_addr = address.sin_addr.s_addr;
+    this->Address.sin_port = address.sin_port;
 
-        return *this;
-    }
+    return *this;
+}
 
-    Socket& Socket::Bind(sockaddr_in& address)
-    {
-        this->SetAddress(address);
+Socket& Socket::Bind(sockaddr_in& address)
+{
+    this->SetAddress(address);
 
-        bind(this->ID, (sockaddr*)&this->Address, sizeof(this->Address));
+    bind(this->ID, (sockaddr*)&this->Address, sizeof(this->Address));
 
-        return *this;
-    }
+    return *this;
+}
 
-    Socket::~Socket()
-    {                           //
-    }
+Socket::~Socket()
+{ //
+}
 }

@@ -1,7 +1,7 @@
+#include "sockets/tcp.hpp"
 #include <fstream>
-#include <magnus.hpp>
-#include "sockets/tcp.h"
 #include <iostream>
+#include <magnus.hpp>
 
 using namespace LibMagnus;
 
@@ -13,4 +13,3 @@ int main()
 
     return 0;
 }
-
