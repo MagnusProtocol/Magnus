@@ -83,7 +83,10 @@ target_compile_options(libmagnus PRIVATE
     -Wall -DADDRESS_SANITIZER
 )
 
-# Magnus (frontend/cli)
-add_executable(magnus ${MAGNUS_SOURCES})
-target_include_directories(magnus PRIVATE magnus/include)
-target_link_libraries(magnus PRIVATE libmagnus)
+# Client
+add_executable(client magnus/source/client.cpp)
+target_link_libraries(client PRIVATE libmagnus)
+
+# Server
+add_executable(server magnus/source/server.cpp)
+target_link_libraries(server PRIVATE libmagnus)

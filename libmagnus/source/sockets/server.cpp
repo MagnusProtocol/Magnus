@@ -98,15 +98,19 @@ int Server::Receive()
 {
     this->Buffer.clear();
 
-    return recv(this->ConnectionID, this->Buffer.data(), this->MaxBufferLength, 0);
+    ssize_t recv_bytes = 0;
+    if ((recv_bytes = recv(this->ConnectionID, this->Buffer.data(), this->MaxBufferLength, 0)) < 0) {
+        std::cout << "Recv failed." << std::endl;
+    }
+
+    return recv_bytes;
 }
 
 Server& Server::Send(int bytes)
 {
-    if (send(this->ConnectionID, this->Buffer.data(), bytes, 0) < 0)
-#ifdef DEBUG
+    if (send(this->ConnectionID, this->Buffer.data(), bytes, 0) < 0) {
         std::cout << "Server response failure.";
-#endif
+    }
 
     return *this;
 }
@@ -125,10 +129,9 @@ int Server::Read()
     int bytes = 0;
 
     while ((bytes = this->Receive()) > 0) {
-#ifdef LOG
         std::cout << "Recieved buffer: " << this->Buffer.c_str() << '\n'
                   << "Stack Size: " << this->BufferStack.size() << '\n';
-#endif
+
         this->BufferStack.push_back(this->Buffer);
         this->Send(bytes + 1);
     }
@@ -142,7 +145,6 @@ void Server::Start()
 #ifdef LOG
         std::cout << "The server is already running." << '\n';
 #endif
-
         return;
     }
 
@@ -151,7 +153,9 @@ void Server::Start()
     this->Accept();
 
     while (this->Running) {
-        this->Read();
+        if (this->Read() <= 0) {
+            this->Accept();
+        }
     }
 
     this->Stop();

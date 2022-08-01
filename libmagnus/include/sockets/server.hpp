@@ -68,7 +68,7 @@ public:
     Server(std::string_view&);
     Server(Server&) = default;
     Server(Server&&) = default;
-    Server& operator=(const Server&) = default;
+    Server& operator=(Server&) = default;
     Server& operator=(Server&&) = default;
     ~Server();
 };

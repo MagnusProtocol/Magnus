@@ -72,17 +72,12 @@ std::string_view Client::Send(std::string_view buffer)
         this->Connect();
 
     if (send(this->mSocket.ID, buffer.data(), buffer.size(), 0) < 0) {
-#ifdef LOG
-        std::cout << "Buffer sending failed.";
-#endif
-
+        std::cout << "Buffer sending failed." << '\n';
         return this->ResponseBuffer;
     }
 
     if (!this->Receive())
-#ifdef LOG
         std::cout << "Receiving failed.\n";
-#endif
 
     return this->ResponseBuffer;
 }
