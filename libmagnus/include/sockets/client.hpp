@@ -31,7 +31,7 @@ protected:
 
     uint64_t BufferSize { 4096 };
 
-    virtual uint8_t Receive();
+    virtual ssize_t Receive();
 
 public:
     ServerInfo DefaultServerInfo;

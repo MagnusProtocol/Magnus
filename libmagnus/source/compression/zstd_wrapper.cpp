@@ -34,7 +34,7 @@ namespace Magnus::LibMagnus::Compression
 
         CHECK(mCctx != NULL, "ZSTD_createCCtx() failed!");
         // ZSTD_CCtx_setParameter(mCctx, ZSTD_c_compressionLevel, 3);
-        ZSTD_CCtx_setParameter(mCctx, ZSTD_c_nbWorkers, std::thread::hardware_concurrency());
+        ZSTD_CCtx_setParameter(mCctx, ZSTD_c_nbWorkers, (int)std::thread::hardware_concurrency());
     }
 
     /*

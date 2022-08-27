@@ -82,7 +82,7 @@ std::string_view Client::Send(std::string_view buffer)
     return this->ResponseBuffer;
 }
 
-uint8_t Client::Receive()
+ssize_t Client::Receive()
 {
     return recv(this->mSocket.ID, const_cast<char*>(this->ResponseBuffer.c_str()), this->BufferSize, 0);
 }
@@ -126,9 +126,9 @@ Client::Client(Client&& client)
 
 Client& Client::operator=(Client& client) noexcept
 {
-    Client _client;
+    Client _client = Client(client);
 
-    return (_client = Client(client));
+    return _client;
 }
 
 Client& Client::operator=(Client&& client) noexcept

@@ -81,6 +81,14 @@ target_precompile_headers(libmagnus
 # Enable some compiler/linker options.
 target_compile_options(libmagnus PRIVATE
     -Wall -DADDRESS_SANITIZER
+    -Walloca -Wcast-qual -Wconversion
+    -Wnull-dereference -Wstack-protector -Warray-bounds 
+    -Warray-bounds-pointer-arithmetic -Wassign-enum -Wbad-function-cast 
+    -Wconditional-uninitialized -Wconversion -Wfloat-equal -Wformat-type-confusion 
+    -Widiomatic-parentheses -Wimplicit-fallthrough -Wloop-analysis 
+    -Wpointer-arith -Wshift-sign-overflow -Wshorten-64-to-32 -Wswitch-enum 
+    -Wtautological-constant-in-range-compare -Wunreachable-code-aggressive 
+    -Wthread-safety -Wthread-safety-beta -Wcomma -D_FORTIFY_SOURCE=2
 )
 
 # Client

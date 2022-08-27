@@ -51,7 +51,8 @@ Integer Encryption::decode_shared_key(SecByteBlock& shared_key)
     return shared_secret;
 }
 
-void Encryption::encrypt_data_aes_256(SecByteBlock& key, std::string& data, byte* out_data, const CryptoPP::byte* iv)
+void Encryption::encrypt_data_aes_256(SecByteBlock& key, std::string& data,
+        byte* out_data, const CryptoPP::byte* iv)
 {
     if (key.size() != AES::MAX_KEYLENGTH) {
         throw std::runtime_error("Encryption Key and AES Key lengths don't match.");
@@ -71,7 +72,8 @@ void Encryption::encrypt_data_aes_256(SecByteBlock& key, std::string& data, byte
     std::memcpy(out_data, data_bytes, data.size());
 }
 
-void Encryption::decrypt_data_aes_256(SecByteBlock& key, std::string& data, byte* out_data, const CryptoPP::byte* iv)
+void Encryption::decrypt_data_aes_256(SecByteBlock& key, std::string& data,
+        byte* out_data, const CryptoPP::byte* iv)
 {
     if (key.size() != AES::MAX_KEYLENGTH) {
         throw std::runtime_error("Encryption Key and AES Key lengths don't match.");
@@ -90,7 +92,8 @@ void Encryption::decrypt_data_aes_256(SecByteBlock& key, std::string& data, byte
     std::memcpy(out_data, data_bytes, data.size());
 }
 
-void Encryption::decrypt_data_aes_256(SecByteBlock& key, byte* data, size_t length, byte* out_data, const CryptoPP::byte* iv)
+void Encryption::decrypt_data_aes_256(SecByteBlock& key, byte* data,
+        size_t length, byte* out_data, const CryptoPP::byte* iv)
 {
     if (key.size() != AES::MAX_KEYLENGTH) {
         throw std::runtime_error("Encryption Key and AES Key lengths don't match.");
