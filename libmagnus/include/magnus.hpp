@@ -7,10 +7,10 @@
 
 namespace LibMagnus
 {
-    class Magnus
-    {
-    public:
-        Magnus();
-        ~Magnus();
-    };
-}
+class Magnus
+{
+	public:
+	Magnus();
+	~Magnus();
+};
+} // namespace LibMagnus

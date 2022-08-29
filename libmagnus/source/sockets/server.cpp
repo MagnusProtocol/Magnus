@@ -1,167 +1,171 @@
 #include "sockets/server.hpp"
 
-namespace LibMagnus {
-Server::Server()
-    : Bound(false)
-    , Running(false)
+namespace LibMagnus
 {
-    this->Buffer.reserve(this->MaxBufferLength);
+Server::Server() : Bound(false), Running(false)
+{
+	this->Buffer.reserve(this->MaxBufferLength);
 
-    this->Initialize();
+	this->Initialize();
 }
 
-Server::Server(std::string_view& address)
-    : Bound(false)
-    , Running(false)
-    , AddressString(address)
+Server::Server(std::string_view &address) : Bound(false), Running(false), AddressString(address)
 {
-    this->Buffer.reserve(this->MaxBufferLength);
+	this->Buffer.reserve(this->MaxBufferLength);
 
-    this->SetAddress(address);
-    this->Initialize();
+	this->SetAddress(address);
+	this->Initialize();
 }
 
-Server& Server::Bind(sockaddr_in& address)
+Server &Server::Bind(sockaddr_in &address)
 {
-    this->mSocket.Bind(address);
+	this->mSocket.Bind(address);
 
-    this->Bound = true;
+	this->Bound = true;
 
-    return *this;
+	return *this;
 }
 
-Server& Server::Initialize()
+Server &Server::Initialize()
 {
-    if (!this->Bound) {
-        this->Address.sin_family = AF_INET;
-        this->Address.sin_addr.s_addr = htonl(INADDR_ANY);
-        this->Address.sin_port = htons(this->Port);
+	if (!this->Bound)
+	{
+		this->Address.sin_family = AF_INET;
+		this->Address.sin_addr.s_addr = htonl(INADDR_ANY);
+		this->Address.sin_port = htons(this->Port);
 
-        this->mSocket = Socket(this->Address);
+		this->mSocket = Socket(this->Address);
 
-        this->Bound = 1;
-    }
+		this->Bound = 1;
+	}
 
-    this->Listen();
+	this->Listen();
 
-    return *this;
+	return *this;
 }
 
-Server& Server::SetAddress(std::string_view& address)
+Server &Server::SetAddress(std::string_view &address)
 {
-    this->Address.sin_family = AF_INET;
-    this->Address.sin_addr.s_addr = inet_addr(address.data());
-    this->Address.sin_port = htons(this->Port);
+	this->Address.sin_family = AF_INET;
+	this->Address.sin_addr.s_addr = inet_addr(address.data());
+	this->Address.sin_port = htons(this->Port);
 
-    this->Bind(this->Address);
+	this->Bind(this->Address);
 
-    return *this;
+	return *this;
 }
 
 std::string_view Server::GetAddressString()
 {
-    return this->AddressString;
+	return this->AddressString;
 }
 
 void Server::Stop()
 {
 #ifdef LOG
-    std::cout << "Closing the connection with ID " << this->ConnectionID << ".\n";
+	std::cout << "Closing the connection with ID " << this->ConnectionID << ".\n";
 #endif
 
-    close(this->mSocket.ID);
+	close(this->mSocket.ID);
 
-    this->Running = 0;
+	this->Running = 0;
 }
 
-Server& Server::Listen()
+Server &Server::Listen()
 {
-    listen(this->mSocket.ID, this->MaxConnections);
+	listen(this->mSocket.ID, this->MaxConnections);
 
 #ifdef LOG
-    std::cout << "Server socket listening on " << this->Address.sin_addr.s_addr << ":" << this->Address.sin_port << '\n';
+	std::cout << "Server socket listening on " << this->Address.sin_addr.s_addr << ":"
+			  << this->Address.sin_port << '\n';
 #endif
 
-    return *this;
+	return *this;
 }
 
-Server& Server::Accept()
+Server &Server::Accept()
 {
-    socklen_t len = sizeof(this->ClientAddress);
+	socklen_t len = sizeof(this->ClientAddress);
 
-    this->ConnectionID = accept(this->mSocket.ID, (sockaddr*)&this->ClientAddress, &len);
+	this->ConnectionID = accept(this->mSocket.ID, (sockaddr *)&this->ClientAddress, &len);
 
-    return *this;
+	return *this;
 }
 
 int Server::Receive()
 {
-    this->Buffer.clear();
+	this->Buffer.clear();
 
-    ssize_t recv_bytes = 0;
-    if ((recv_bytes = recv(this->ConnectionID, this->Buffer.data(), this->MaxBufferLength, 0)) < 0) {
-        std::cout << "Recv failed." << std::endl;
-    }
+	ssize_t recv_bytes = 0;
+	if ((recv_bytes = recv(this->ConnectionID, this->Buffer.data(), this->MaxBufferLength, 0)) < 0)
+	{
+		std::cout << "Recv failed." << std::endl;
+	}
 
-    return recv_bytes;
+	return recv_bytes;
 }
 
-Server& Server::Send(int bytes)
+Server &Server::Send(int bytes)
 {
-    if (send(this->ConnectionID, this->Buffer.data(), bytes, 0) < 0) {
-        std::cout << "Server response failure.";
-    }
+	if (send(this->ConnectionID, this->Buffer.data(), bytes, 0) < 0)
+	{
+		std::cout << "Server response failure.";
+	}
 
-    return *this;
+	return *this;
 }
 
-Server& Server::SetBufferSize(ulong size)
+Server &Server::SetBufferSize(ulong size)
 {
-    this->MaxBufferLength = size;
+	this->MaxBufferLength = size;
 
-    this->Buffer.resize(size);
+	this->Buffer.resize(size);
 
-    return *this;
+	return *this;
 }
 
 int Server::Read()
 {
-    int bytes = 0;
+	int bytes = 0;
 
-    while ((bytes = this->Receive()) > 0) {
-        std::cout << "Recieved buffer: " << this->Buffer.c_str() << '\n'
-                  << "Stack Size: " << this->BufferStack.size() << '\n';
+	while ((bytes = this->Receive()) > 0)
+	{
+		std::cout << "Recieved buffer: " << this->Buffer.c_str() << '\n'
+				  << "Stack Size: " << this->BufferStack.size() << '\n';
 
-        this->BufferStack.push_back(this->Buffer);
-        this->Send(bytes + 1);
-    }
+		this->BufferStack.push_back(this->Buffer);
+		this->Send(bytes + 1);
+	}
 
-    return bytes;
+	return bytes;
 }
 
 void Server::Start()
 {
-    if (this->Running) {
+	if (this->Running)
+	{
 #ifdef LOG
-        std::cout << "The server is already running." << '\n';
+		std::cout << "The server is already running." << '\n';
 #endif
-        return;
-    }
+		return;
+	}
 
-    this->Running = 1;
+	this->Running = 1;
 
-    this->Accept();
+	this->Accept();
 
-    while (this->Running) {
-        if (this->Read() <= 0) {
-            this->Accept();
-        }
-    }
+	while (this->Running)
+	{
+		if (this->Read() <= 0)
+		{
+			this->Accept();
+		}
+	}
 
-    this->Stop();
+	this->Stop();
 }
 
 Server::~Server()
 {
 }
-}
+} // namespace LibMagnus

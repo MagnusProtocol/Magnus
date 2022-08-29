@@ -1,13 +1,12 @@
 #include "sockets/tcp.hpp"
 
-namespace LibMagnus {
-TCPServer::TCPServer()
-    : Server()
+namespace LibMagnus
+{
+TCPServer::TCPServer() : Server()
 {
 }
 
-TCPServer::TCPServer(std::string_view address)
-    : Server(address)
+TCPServer::TCPServer(std::string_view address) : Server(address)
 {
 }
 
@@ -27,4 +26,4 @@ TCPServer::TCPServer(std::string_view address)
 TCPServer::~TCPServer()
 {
 }
-}
+} // namespace LibMagnus

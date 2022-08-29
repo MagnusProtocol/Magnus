@@ -3,7 +3,8 @@
 #include <string_view>
 #include <vector>
 
-namespace Magnus::LibMagnus::Slicing {
+namespace Magnus::LibMagnus::Slicing
+{
 
 /*
  * @brief: The function takes in a string view and slices it into parts
@@ -17,4 +18,4 @@ std::vector<std::string_view> slice_into_parts(std::string_view data);
  * @brief: This function pads a string with the given number of bytes.
  * */
 std::string_view pad_string(std::string_view data, double padding);
-}
+} // namespace Magnus::LibMagnus::Slicing

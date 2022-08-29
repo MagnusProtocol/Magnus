@@ -11,11 +11,11 @@
 
 namespace LibMagnus
 {
-    Magnus::Magnus()
-    {
-    }
-
-    Magnus::~Magnus()
-    {
-    }
+Magnus::Magnus()
+{
 }
+
+Magnus::~Magnus()
+{
+}
+} // namespace LibMagnus
