@@ -16,8 +16,8 @@ namespace LibMagnus
 {
 enum class ConnectionStatus
 {
-	Connected,
-	Disconnected
+    Connected,
+    Disconnected
 };
 
 /*
@@ -25,38 +25,38 @@ enum class ConnectionStatus
  */
 class Client
 {
-	protected:
-	Socket mSocket;
+    protected:
+    Socket mSocket;
 
-	ConnectionStatus Status;
+    ConnectionStatus Status;
 
-	std::string ResponseBuffer;
+    std::string ResponseBuffer;
 
-	uint64_t BufferSize{4096};
+    uint64_t BufferSize{4096};
 
-	virtual ssize_t Receive();
+    virtual ssize_t Receive();
 
-	public:
-	ServerInfo DefaultServerInfo;
+    public:
+    ServerInfo DefaultServerInfo;
 
-	ConnectionStatus GetStatus(); // Returns the connection status of the Client.
+    ConnectionStatus GetStatus(); // Returns the connection status of the Client.
 
-	Client& SetBufferSize(uint64_t);
-	Client& SetAddress(std::string_view);
-	Client& SetPort(uint16_t);
+    Client& SetBufferSize(uint64_t);
+    Client& SetAddress(std::string_view);
+    Client& SetPort(uint16_t);
 
-	virtual Client& Connect();
-	virtual Client& Connect(std::string_view);
-	virtual Client& Connect(ServerInfo&);
-	virtual std::string_view Send(
-		std::string_view); // Sends the pro:vided string_view to the connected server
+    virtual Client& Connect();
+    virtual Client& Connect(std::string_view);
+    virtual Client& Connect(ServerInfo&);
+    virtual std::string_view Send(
+        std::string_view); // Sends the pro:vided string_view to the connected server
 
-	Client();
-	Client(std::string_view, uint16_t); // with default server address
-	Client(ServerInfo);
-	Client(Client&);
-	Client(Client&&);
-	~Client();
+    Client();
+    Client(std::string_view, uint16_t); // with default server address
+    Client(ServerInfo);
+    Client(Client&);
+    Client(Client&&);
+    ~Client();
 };
 } // namespace LibMagnus
 

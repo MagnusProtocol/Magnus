@@ -15,24 +15,24 @@ namespace LibMagnus
 {
 class Socket
 {
-	public:
-	int ID;
+    public:
+    int ID;
 
-	sockaddr_in Address;
+    sockaddr_in Address;
 
-	Socket& SetAddress(sockaddr_in&);
-	Socket& Bind(sockaddr_in&);
+    Socket& SetAddress(sockaddr_in&);
+    Socket& Bind(sockaddr_in&);
 
-	Socket();
+    Socket();
 
-	Socket(sockaddr_in& address);
-	Socket(Socket&) = default;
-	Socket(Socket&&) = default;
+    Socket(sockaddr_in& address);
+    Socket(Socket&) = default;
+    Socket(Socket&&) = default;
 
-	Socket& operator=(Socket&) = default;
-	Socket& operator=(Socket&&) = default;
+    Socket& operator=(Socket&) = default;
+    Socket& operator=(Socket&&) = default;
 
-	~Socket();
+    ~Socket();
 };
 } // namespace LibMagnus
 
