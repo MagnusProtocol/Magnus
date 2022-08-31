@@ -79,15 +79,15 @@ std::string_view Client::Send(std::string_view buffer)
         std::cout << "Buffer sending failed." << '\n';
     }
 
-    // if (!this->Receive())
-    //     std::cout << "Receiving failed.\n";
+    if (!this->Receive())
+        std::cout << "Receiving failed.\n";
 
     return this->ResponseBuffer;
 }
 
 ssize_t Client::Receive()
 {
-    return recv(this->mSocket.ID, const_cast<char*>(this->ResponseBuffer.c_str()),
+    return recv(this->mSocket.ID, this->ResponseBuffer.data(),
         this->BufferSize, 0);
 }
 
