@@ -20,17 +20,17 @@ class Socket
 
 	sockaddr_in Address;
 
-	Socket &SetAddress(sockaddr_in &);
-	Socket &Bind(sockaddr_in &);
+	Socket& SetAddress(sockaddr_in&);
+	Socket& Bind(sockaddr_in&);
 
 	Socket();
 
-	Socket(sockaddr_in &address);
-	Socket(Socket &) = default;
-	Socket(Socket &&) = default;
+	Socket(sockaddr_in& address);
+	Socket(Socket&) = default;
+	Socket(Socket&&) = default;
 
-	Socket &operator=(Socket &) = default;
-	Socket &operator=(Socket &&) = default;
+	Socket& operator=(Socket&) = default;
+	Socket& operator=(Socket&&) = default;
 
 	~Socket();
 };

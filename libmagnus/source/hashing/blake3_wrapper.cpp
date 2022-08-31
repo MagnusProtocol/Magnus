@@ -12,7 +12,7 @@ BLAKE3::BLAKE3(std::string_view input) : _input(input)
 BLAKE3::~BLAKE3()
 {
 }
-std::string BLAKE3::uint8_vector_to_hex_string(const std::vector<uint8_t> &v)
+std::string BLAKE3::uint8_vector_to_hex_string(const std::vector<uint8_t>& v)
 {
 	std::stringstream os;
 	for (size_t i = 0; i < BLAKE3_OUT_LEN; i++)

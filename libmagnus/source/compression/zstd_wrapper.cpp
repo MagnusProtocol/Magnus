@@ -20,7 +20,7 @@
 		CHECK(!ZSTD_isError(err), "[ERROR] ZSTD: %s", ZSTD_getErrorName(err));                     \
 	} while (0)
 
-namespace Magnus::LibMagnus::Compression
+namespace LibMagnus::Compression
 {
 // Common setup function for all the class constructors
 void ZSTD::setup()
@@ -64,7 +64,7 @@ ZSTD::ZSTD(std::string_view input, MODES mode)
  * @param input: the string to be compressed/decompressed
  * @param mode: To compress or to decompress, that is the question.
  */
-ZSTD::ZSTD(std::string &input, MODES mode)
+ZSTD::ZSTD(std::string& input, MODES mode)
 {
 	mInput = input;
 
@@ -176,7 +176,7 @@ void ZSTD::compress_file()
 			size_t const remaining = ZSTD_compressStream2(mCctx, &output, &input, mode);
 
 			CHECK_ZSTD(remaining);
-			mBuffer.append((char *)mBuffOut, output.pos);
+			mBuffer.append((char*)mBuffOut, output.pos);
 
 			finished = last_chunk ? (remaining == 0) : (input.pos == input.size);
 		} while (!finished);
@@ -232,7 +232,7 @@ void ZSTD::decompress_file()
 
 			size_t const ret = ZSTD_decompressStream(mDctx, &output, &input);
 			CHECK_ZSTD(ret);
-			mBuffer.append(static_cast<const char *>(mBuffOut), output.pos);
+			mBuffer.append(static_cast<const char*>(mBuffOut), output.pos);
 		}
 	}
 }
@@ -255,7 +255,7 @@ std::string_view ZSTD::get_string_view()
  * @brief: Getter function for the result of the operations
  * @returns: The result of the compression/decompression as a std::string
  */
-std::string &ZSTD::get_string()
+std::string ZSTD::get_string()
 {
 	if (mBuffer.empty())
 	{
@@ -265,4 +265,4 @@ std::string &ZSTD::get_string()
 
 	return mBuffer;
 }
-} // namespace Magnus::LibMagnus::Compression
+} // namespace LibMagnus::Compression

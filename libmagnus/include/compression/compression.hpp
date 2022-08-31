@@ -1,6 +1,6 @@
 #pragma once
 #include "spdlog/sinks/stdout_color_sinks.h"
-#include "utils.hpp"
+#include "utils/utils.hpp"
 #include <iostream>
 #include <spdlog/spdlog.h>
 
@@ -14,7 +14,7 @@ class CompressionBase
 		spdlog::error("Not yet implemented.");
 		return nullptr;
 	};
-	virtual std::string &get_string()
+	virtual std::string get_string()
 	{
 		spdlog::error("Not yet implemented.");
 	};

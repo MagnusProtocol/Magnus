@@ -14,12 +14,12 @@ class LZ4 : public CompressionBase
 	std::shared_ptr<spdlog::logger> _logger;
 
 	public:
-	LZ4(std::string_view &input);
+	LZ4(std::string_view& input);
 	LZ4(std::filesystem::path filename);
 	~LZ4();
 
 	std::string_view get_string_view();
-	std::string &get_string();
+	std::string get_string();
 
 	void compress_string();
 	void decompress_string();
