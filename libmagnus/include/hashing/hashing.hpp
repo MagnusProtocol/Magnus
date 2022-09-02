@@ -18,7 +18,7 @@ class HashingBase
 		return nullptr;
 	};
 
-	virtual std::string *get_string()
+	virtual std::string* get_string()
 	{
 		spdlog::error("Not yet implemented.");
 		return nullptr;

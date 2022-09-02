@@ -10,11 +10,11 @@ class UDPServer
 	public:
 	UDPServer() = default;
 
-	UDPServer(UDPServer &) = default;
-	UDPServer(UDPServer &&) = default;
+	UDPServer(UDPServer&) = default;
+	UDPServer(UDPServer&&) = default;
 
-	UDPServer &operator=(UDPServer &) = default;
-	UDPServer &operator=(UDPServer &&) = default;
+	UDPServer& operator=(UDPServer&) = default;
+	UDPServer& operator=(UDPServer&&) = default;
 
 	~UDPServer() = default;
 };

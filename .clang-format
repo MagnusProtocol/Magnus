@@ -8,5 +8,5 @@ SpacesInAngles: 'false'
 SpacesInCStyleCastParentheses: 'false'
 TabWidth: '4'
 UseTab: Always
-
+PointerAlignment: Left
 ...

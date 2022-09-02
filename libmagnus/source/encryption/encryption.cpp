@@ -13,14 +13,14 @@ Encryption::~Encryption()
 {
 }
 
-Keys &Encryption::get_keys()
+Keys& Encryption::get_keys()
 {
 	return mKeys;
 }
 
 // param pKeys: person B's Keys.
 // variable mKeys: person A's keys
-SecByteBlock Encryption::generate_shared_key(Keys &pKeys)
+SecByteBlock Encryption::generate_shared_key(Keys& pKeys)
 {
 	// pKeys = Keys that were provided
 	// mKeyss = Keys that were generated in the class
@@ -44,7 +44,7 @@ SecByteBlock Encryption::generate_shared_key(Keys &pKeys)
 	return mSharedKey;
 }
 
-Integer Encryption::decode_shared_key(SecByteBlock &shared_key)
+Integer Encryption::decode_shared_key(SecByteBlock& shared_key)
 {
 	Integer shared_secret;
 	shared_secret.Decode(shared_key.BytePtr(), shared_key.SizeInBytes());
@@ -52,8 +52,8 @@ Integer Encryption::decode_shared_key(SecByteBlock &shared_key)
 	return shared_secret;
 }
 
-void Encryption::encrypt_data_aes_256(SecByteBlock &key, std::string &data, byte *out_data,
-									  const CryptoPP::byte *iv)
+void Encryption::encrypt_data_aes_256(SecByteBlock& key, std::string& data, byte* out_data,
+									  const CryptoPP::byte* iv)
 {
 	if (key.size() != AES::MAX_KEYLENGTH)
 	{
@@ -75,8 +75,8 @@ void Encryption::encrypt_data_aes_256(SecByteBlock &key, std::string &data, byte
 	std::memcpy(out_data, data_bytes, data.size());
 }
 
-void Encryption::decrypt_data_aes_256(SecByteBlock &key, std::string &data, byte *out_data,
-									  const CryptoPP::byte *iv)
+void Encryption::decrypt_data_aes_256(SecByteBlock& key, std::string& data, byte* out_data,
+									  const CryptoPP::byte* iv)
 {
 	if (key.size() != AES::MAX_KEYLENGTH)
 	{
@@ -97,8 +97,8 @@ void Encryption::decrypt_data_aes_256(SecByteBlock &key, std::string &data, byte
 	std::memcpy(out_data, data_bytes, data.size());
 }
 
-void Encryption::decrypt_data_aes_256(SecByteBlock &key, byte *data, size_t length, byte *out_data,
-									  const CryptoPP::byte *iv)
+void Encryption::decrypt_data_aes_256(SecByteBlock& key, byte* data, size_t length, byte* out_data,
+									  const CryptoPP::byte* iv)
 {
 	if (key.size() != AES::MAX_KEYLENGTH)
 	{
@@ -116,7 +116,7 @@ void Encryption::decrypt_data_aes_256(SecByteBlock &key, byte *data, size_t leng
 	std::memcpy(out_data, data, length);
 }
 
-void string_to_byte(std::string &data, byte *data_bytes)
+void string_to_byte(std::string& data, byte* data_bytes)
 {
 	std::copy(data.begin(), data.end(), data_bytes);
 	data_bytes[data.length()] = 0;

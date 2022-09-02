@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 project("Magnus")
-
+# Use clang and lincxx
 # Set C++ options
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -81,14 +81,8 @@ target_precompile_headers(libmagnus
 # Enable some compiler/linker options.
 target_compile_options(libmagnus PRIVATE
     -Wall -DADDRESS_SANITIZER
-    -Walloca -Wcast-qual -Wconversion
-    -Wnull-dereference -Wstack-protector -Warray-bounds 
-    -Warray-bounds-pointer-arithmetic -Wassign-enum -Wbad-function-cast 
-    -Wconditional-uninitialized -Wconversion -Wfloat-equal -Wformat-type-confusion 
-    -Widiomatic-parentheses -Wimplicit-fallthrough -Wloop-analysis 
-    -Wpointer-arith -Wshift-sign-overflow -Wshorten-64-to-32 -Wswitch-enum 
-    -Wtautological-constant-in-range-compare -Wunreachable-code-aggressive 
-    -Wthread-safety -Wthread-safety-beta -Wcomma -D_FORTIFY_SOURCE=2
+    
+	#-Walloca -Wcast-qual -Wconversion
    # -fsanitize=address -fno-omit-frame-pointer
 )
 target_link_options(libmagnus PRIVATE

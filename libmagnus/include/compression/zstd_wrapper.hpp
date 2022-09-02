@@ -23,20 +23,20 @@ class ZSTD : public CompressionBase
 	std::filesystem::path mFilename;
 
 	// Compression context
-	ZSTD_CCtx *mCctx;
+	ZSTD_CCtx* mCctx;
 	// Decompression context
-	ZSTD_DCtx *mDctx;
+	ZSTD_DCtx* mDctx;
 
 	// Input & output buffers for files
-	void *mBuffIn = nullptr;
-	void *mBuffOut = nullptr;
+	void* mBuffIn = nullptr;
+	void* mBuffOut = nullptr;
 
 	// Sizes for both the buffers
 	size_t mBuffInSize;
 	size_t mBuffOutSize;
 
 	// File pointer in case we need it
-	FILE *mFin;
+	FILE* mFin;
 
 	/*
 	 * @brief: Internal function to compress a file which had been opened in the constructor.
@@ -78,7 +78,7 @@ class ZSTD : public CompressionBase
 	 * @param input: the string to be compressed/decompressed
 	 * @param mode: To compress or to decompress, that is the question.
 	 */
-	ZSTD(std::string &input, MODES mode);
+	ZSTD(std::string& input, MODES mode);
 
 	/*
 	 * @brief: Compress/Decompress file; to obtain the result of this function, call the applicable
@@ -103,6 +103,6 @@ class ZSTD : public CompressionBase
 	 * @brief: Getter function for the result of the operations
 	 * @returns: The result of the compression/decompression as a std::string
 	 */
-	std::string &get_string();
+	std::string& get_string();
 };
 }; // namespace Magnus::LibMagnus::Compression
