@@ -131,6 +131,7 @@ int Server::Read()
 
     while ((bytes = this->Receive()) > 0)
     {
+
         std::cout << "Recieved buffer: " << this->Buffer.c_str() << '\n'
                   << "Stack Size: " << this->BufferStack.size() << '\n';
 

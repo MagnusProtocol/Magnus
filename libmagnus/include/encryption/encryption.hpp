@@ -1,5 +1,6 @@
 #pragma once
 
+#include "integer.h"
 #include <iostream>
 #include <spdlog/spdlog.h>
 #include <stdio.h>

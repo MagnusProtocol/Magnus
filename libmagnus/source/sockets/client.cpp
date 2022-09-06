@@ -60,9 +60,7 @@ Client& Client::Connect()
     if (connect(this->mSocket.ID, (sockaddr*)&this->DefaultServerInfo.Address,
                 sizeof(this->DefaultServerInfo.Address)) < 0)
     {
-#ifdef LOG
         perror("Connection failed");
-#endif
 
         return *this;
     }

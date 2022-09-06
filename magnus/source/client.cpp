@@ -9,32 +9,22 @@ int main(int argc, char** argv)
 {
     LibMagnus::Client client("127.0.0.1", 3000);
 
-    std::filesystem::path filepath_read;
-    if (argc > 0)
-        filepath_read = argv[1];
-    else
-    {
-        std::cout << "Please input an argument." << std::endl;
-        std::terminate();
-    }
+    auto file_read = LibMagnus::Utils::MMAP("../assets/image.jpg", LibMagnus::Utils::READ);
+    std::string uncompressed_data = file_read.read();
 
-    if (!std::filesystem::exists(filepath_read))
-    {
-        std::cout << "File does not exist." << std::endl;
-    }
+    LibMagnus::Compression::ZSTD compressor(uncompressed_data, LibMagnus::Compression::COMPRESS);
+    std::string_view data = compressor.get_string_view();
 
-    auto mapped_read = LibMagnus::Utils::MMAP(filepath_read, LibMagnus::Utils::MMAP_MODES::READ);
+    const int packet_size = 1024;
 
-    std::string data = mapped_read.read();
-
-    if (data.size() > 1024)
+    if (data.size() > packet_size)
     {
         std::cout << data.size() << std::endl;
 
-        for (size_t i = 0; i < data.size(); i += 1024)
+        for (size_t i = 0; i < data.size(); i += packet_size)
         {
-            std::string substr = data.substr(i, i + 1024);
-            client.Send(substr);
+            client.Send(data.substr(i, i + packet_size));
+            std::cout << i / packet_size << std::endl;
         }
     }
 
