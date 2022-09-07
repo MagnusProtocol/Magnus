@@ -14,29 +14,29 @@ namespace LibMagnus
  */
 struct ServerInfo
 {
-	public:
-	std::string_view AddressString;
+    public:
+    std::string_view AddressString;
 
-	sockaddr_in Address;
+    sockaddr_in Address;
 
-	uint16_t Port;
+    uint16_t Port;
 
-	void SetAddress(std::string_view);
-	void SetAddress(sockaddr_in);
-	void SetPort(uint16_t);
+    void SetAddress(std::string_view);
+    void SetAddress(sockaddr_in);
+    void SetPort(uint16_t);
 
-	sockaddr_in* GetAddress();
-	uint16_t GetPort();
+    sockaddr_in* GetAddress();
+    uint16_t GetPort();
 
-	ServerInfo();
-	ServerInfo(std::string_view, uint16_t);
-	ServerInfo(const ServerInfo&);
-	ServerInfo(ServerInfo&&);
+    ServerInfo();
+    ServerInfo(std::string_view, uint16_t);
+    ServerInfo(const ServerInfo&);
+    ServerInfo(ServerInfo&&);
 
-	ServerInfo& operator=(const ServerInfo&) noexcept;
-	ServerInfo& operator=(ServerInfo&&) noexcept;
+    ServerInfo& operator=(const ServerInfo&) noexcept;
+    ServerInfo& operator=(ServerInfo&&) noexcept;
 
-	~ServerInfo();
+    ~ServerInfo();
 };
 } // namespace LibMagnus
 
