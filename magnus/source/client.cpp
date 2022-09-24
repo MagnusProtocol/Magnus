@@ -17,12 +17,10 @@ int main(int argc, char** argv)
 
     const int packet_size = 1024;
 
-    if (data.size() > packet_size)
-    {
+    if (data.size() > packet_size) {
         std::cout << data.size() << std::endl;
 
-        for (size_t i = 0; i < data.size(); i += packet_size)
-        {
+        for (size_t i = 0; i < data.size(); i += packet_size) {
             client.Send(data.substr(i, i + packet_size));
             std::cout << i / packet_size << std::endl;
         }

@@ -2,8 +2,7 @@
 #include <modes.h>
 #include <rijndael.h>
 
-namespace LibMagnus
-{
+namespace LibMagnus {
 Encryption::Encryption()
 {
     mKeys.dh_key.GenerateKeyPair(mRng, mKeys.private_key, mKeys.public_key);
@@ -53,15 +52,13 @@ Integer Encryption::decode_shared_key(SecByteBlock& shared_key)
 }
 
 void Encryption::encrypt_data_aes_256(SecByteBlock& key, std::string& data, byte* out_data,
-                                      const CryptoPP::byte* iv)
+    const CryptoPP::byte* iv)
 {
-    if (key.size() != AES::MAX_KEYLENGTH)
-    {
+    if (key.size() != AES::MAX_KEYLENGTH) {
         throw std::runtime_error("Encryption Key and AES Key lengths don't match.");
     }
 
-    if (AES::BLOCKSIZE != 16)
-    {
+    if (AES::BLOCKSIZE != 16) {
         throw std::runtime_error("The block size is NOT 16.");
     }
 
@@ -76,15 +73,13 @@ void Encryption::encrypt_data_aes_256(SecByteBlock& key, std::string& data, byte
 }
 
 void Encryption::decrypt_data_aes_256(SecByteBlock& key, std::string& data, byte* out_data,
-                                      const CryptoPP::byte* iv)
+    const CryptoPP::byte* iv)
 {
-    if (key.size() != AES::MAX_KEYLENGTH)
-    {
+    if (key.size() != AES::MAX_KEYLENGTH) {
         throw std::runtime_error("Encryption Key and AES Key lengths don't match.");
     }
 
-    if (AES::BLOCKSIZE != 16)
-    {
+    if (AES::BLOCKSIZE != 16) {
         throw std::runtime_error("The block size is NOT 16.");
     }
 
@@ -98,15 +93,13 @@ void Encryption::decrypt_data_aes_256(SecByteBlock& key, std::string& data, byte
 }
 
 void Encryption::decrypt_data_aes_256(SecByteBlock& key, byte* data, size_t length, byte* out_data,
-                                      const CryptoPP::byte* iv)
+    const CryptoPP::byte* iv)
 {
-    if (key.size() != AES::MAX_KEYLENGTH)
-    {
+    if (key.size() != AES::MAX_KEYLENGTH) {
         throw std::runtime_error("Encryption Key and AES Key lengths don't match.");
     }
 
-    if (AES::BLOCKSIZE != 16)
-    {
+    if (AES::BLOCKSIZE != 16) {
         throw std::runtime_error("The block size is NOT 16.");
     }
 

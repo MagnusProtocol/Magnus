@@ -1,7 +1,6 @@
 #include "sockets/client.hpp"
 
-namespace LibMagnus
-{
+namespace LibMagnus {
 Client& Client::SetAddress(std::string_view address)
 {
     this->DefaultServerInfo.SetAddress(address);
@@ -22,8 +21,7 @@ Client& Client::Connect(std::string_view address)
 
     sockaddr_in* addr = this->DefaultServerInfo.GetAddress();
 
-    if (connect(this->mSocket.ID, (sockaddr*)addr, sizeof(*addr)) < 0)
-    {
+    if (connect(this->mSocket.ID, (sockaddr*)addr, sizeof(*addr)) < 0) {
 #ifdef LOG
         std::cout << "Connection failed." << '\n';
 #endif
@@ -41,8 +39,8 @@ Client& Client::Connect(ServerInfo& serverInfo)
     this->DefaultServerInfo = serverInfo;
 
     if (connect(this->mSocket.ID, (sockaddr*)this->DefaultServerInfo.GetAddress(),
-                sizeof(this->DefaultServerInfo.GetAddress())) < 0)
-    {
+            sizeof(this->DefaultServerInfo.GetAddress()))
+        < 0) {
 #ifdef LOG
         std::cout << "Connection failed." << '\n';
 #endif
@@ -58,8 +56,9 @@ Client& Client::Connect(ServerInfo& serverInfo)
 Client& Client::Connect()
 {
     if (connect(this->mSocket.ID, (sockaddr*)&this->DefaultServerInfo.Address,
-                sizeof(this->DefaultServerInfo.Address)) < 0)
-    {
+            sizeof(this->DefaultServerInfo.Address))
+        < 0) {
+#ifdef LOG
         perror("Connection failed");
 
         return *this;
@@ -75,8 +74,7 @@ std::string_view Client::Send(std::string_view buffer)
     if (this->Status != ConnectionStatus::Connected)
         this->Connect();
 
-    if (send(this->mSocket.ID, buffer.data(), buffer.size(), 0) < 0)
-    {
+    if (send(this->mSocket.ID, buffer.data(), buffer.size(), 0) < 0) {
         std::cout << "Buffer sending failed." << '\n';
     }
 
@@ -88,7 +86,8 @@ std::string_view Client::Send(std::string_view buffer)
 
 ssize_t Client::Receive()
 {
-    return recv(this->mSocket.ID, this->ResponseBuffer.data(), this->BufferSize, 0);
+    return recv(this->mSocket.ID, const_cast<char*>(this->ResponseBuffer.c_str()), this->BufferSize,
+        0);
 }
 
 ConnectionStatus Client::GetStatus()
@@ -96,7 +95,9 @@ ConnectionStatus Client::GetStatus()
     return this->Status;
 }
 
-Client::Client() : Status(ConnectionStatus::Disconnected), DefaultServerInfo(ServerInfo())
+Client::Client()
+    : Status(ConnectionStatus::Disconnected)
+    , DefaultServerInfo(ServerInfo())
 {
 }
 
@@ -107,18 +108,22 @@ Client::Client(std::string_view address, uint16_t port)
     this->Connect();
 }
 
-Client::Client(ServerInfo serverInfo) : DefaultServerInfo(serverInfo)
+Client::Client(ServerInfo serverInfo)
+    : DefaultServerInfo(serverInfo)
 {
 }
 
 Client::Client(Client& client)
-    : mSocket(client.mSocket), Status(client.Status), DefaultServerInfo(client.DefaultServerInfo)
+    : mSocket(client.mSocket)
+    , Status(client.Status)
+    , DefaultServerInfo(client.DefaultServerInfo)
 {
 }
 
 Client::Client(Client&& client)
-    : mSocket(std::move(client.mSocket)), Status(std::move(client.Status)),
-      DefaultServerInfo(std::move(client.DefaultServerInfo))
+    : mSocket(std::move(client.mSocket))
+    , Status(std::move(client.Status))
+    , DefaultServerInfo(std::move(client.DefaultServerInfo))
 {
 }
 

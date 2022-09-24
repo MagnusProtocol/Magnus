@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 project("Magnus")
-
+# Use clang and lincxx
 # Set C++ options
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -90,6 +90,9 @@ target_compile_options(libmagnus PRIVATE
     -Wtautological-constant-in-range-compare -Wunreachable-code-aggressive 
     -Wthread-safety -Wthread-safety-beta -Wcomma -D_FORTIFY_SOURCE=2
     -fsanitize=address -fno-omit-frame-pointer
+
+    #-Walloca -Wcast-qual -Wconversion
+    # -fsanitize=address -fno-omit-frame-pointer
 )
 target_link_options(libmagnus PRIVATE
     -fsanitize=address

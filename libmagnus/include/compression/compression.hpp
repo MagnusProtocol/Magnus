@@ -5,10 +5,9 @@
 #include <spdlog/spdlog.h>
 
 // Base class for all compression backends
-class CompressionBase
-{
+class CompressionBase {
 
-    public:
+public:
     virtual std::string_view get_string_view()
     {
         spdlog::error("Not yet implemented.");
