@@ -1,23 +1,27 @@
 #include "compression/zstd_wrapper.hpp"
 #include <thread>
 
-#define CHECK(cond, ...)                                                            \
-    do {                                                                            \
-        if (!(cond)) {                                                              \
-            fprintf(stderr, "%s:%d CHECK(%s) failed: ", __FILE__, __LINE__, #cond); \
-            fprintf(stderr, "" __VA_ARGS__);                                        \
-            fprintf(stderr, "\n");                                                  \
-            exit(1);                                                                \
-        }                                                                           \
+#define CHECK(cond, ...)                                                                           \
+    do                                                                                             \
+    {                                                                                              \
+        if (!(cond))                                                                               \
+        {                                                                                          \
+            fprintf(stderr, "%s:%d CHECK(%s) failed: ", __FILE__, __LINE__, #cond);                \
+            fprintf(stderr, "" __VA_ARGS__);                                                       \
+            fprintf(stderr, "\n");                                                                 \
+            exit(1);                                                                               \
+        }                                                                                          \
     } while (0)
 
-#define CHECK_ZSTD(fn)                                                         \
-    do {                                                                       \
-        size_t const err = (fn);                                               \
-        CHECK(!ZSTD_isError(err), "[ERROR] ZSTD: %s", ZSTD_getErrorName(err)); \
+#define CHECK_ZSTD(fn)                                                                             \
+    do                                                                                             \
+    {                                                                                              \
+        size_t const err = (fn);                                                                   \
+        CHECK(!ZSTD_isError(err), "[ERROR] ZSTD: %s", ZSTD_getErrorName(err));                     \
     } while (0)
 
-namespace LibMagnus::Compression {
+namespace LibMagnus::Compression
+{
 // Common setup function for all the class constructors
 void ZSTD::setup()
 {
@@ -44,9 +48,12 @@ ZSTD::ZSTD(std::string_view input, MODES mode)
 
     setup();
 
-    if (mode == MODES::COMPRESS) {
+    if (mode == MODES::COMPRESS)
+    {
         compress_string();
-    } else {
+    }
+    else
+    {
         decompress_string();
     }
 }
@@ -63,9 +70,12 @@ ZSTD::ZSTD(std::string& input, MODES mode)
 
     setup();
 
-    if (mode == MODES::COMPRESS) {
+    if (mode == MODES::COMPRESS)
+    {
         compress_string();
-    } else {
+    }
+    else
+    {
         decompress_string();
     }
 }
@@ -82,7 +92,8 @@ ZSTD::ZSTD(std::filesystem::path filename, MODES mode)
 
     setup();
 
-    if (mode == MODES::COMPRESS) {
+    if (mode == MODES::COMPRESS)
+    {
         mBuffInSize = ZSTD_CStreamInSize();
         mBuffOutSize = ZSTD_CStreamOutSize();
 
@@ -90,7 +101,9 @@ ZSTD::ZSTD(std::filesystem::path filename, MODES mode)
         mBuffOut = malloc(mBuffOutSize);
 
         compress_file();
-    } else {
+    }
+    else
+    {
         mBuffInSize = ZSTD_DStreamInSize();
         mBuffOutSize = ZSTD_DStreamOutSize();
 
@@ -110,7 +123,8 @@ ZSTD::~ZSTD()
     ZSTD_freeCCtx(mCctx);
     ZSTD_freeDCtx(mDctx);
 
-    if (mBuffIn != nullptr && mBuffOut != nullptr) {
+    if (mBuffIn != nullptr && mBuffOut != nullptr)
+    {
         free(mBuffIn);
         free(mBuffOut);
         fclose(mFin);
@@ -122,7 +136,8 @@ ZSTD::~ZSTD()
  */
 void ZSTD::compress_string()
 {
-    if (mInput.empty() == true) {
+    if (mInput.empty() == true)
+    {
         mLogger->error("Magnus: Please use the correct constructor.");
         throw std::exception();
     }
@@ -130,7 +145,8 @@ void ZSTD::compress_string()
     const size_t buffer_size = ZSTD_compressBound(mInput.size());
     mBuffer.resize(buffer_size);
 
-    size_t const c_size = ZSTD_compressCCtx(mCctx, mBuffer.data(), buffer_size, mInput.data(), mInput.size(), 3);
+    size_t const c_size =
+        ZSTD_compressCCtx(mCctx, mBuffer.data(), buffer_size, mInput.data(), mInput.size(), 3);
 
     CHECK_ZSTD(c_size);
     mBuffer.resize(c_size);
@@ -143,18 +159,20 @@ void ZSTD::compress_file()
 {
 
     size_t const to_read = mBuffInSize;
-    for (;;) {
+    for (;;)
+    {
         size_t read = fread(mBuffIn, 1, to_read, mFin);
 
         int const last_chunk = (read < to_read);
         ZSTD_EndDirective const mode = last_chunk ? ZSTD_e_end : ZSTD_e_continue;
 
-        ZSTD_inBuffer input = { mBuffIn, read, 0 };
+        ZSTD_inBuffer input = {mBuffIn, read, 0};
 
         int finished;
-        do {
+        do
+        {
 
-            ZSTD_outBuffer output = { mBuffOut, mBuffOutSize, 0 };
+            ZSTD_outBuffer output = {mBuffOut, mBuffOutSize, 0};
             size_t const remaining = ZSTD_compressStream2(mCctx, &output, &input, mode);
 
             CHECK_ZSTD(remaining);
@@ -164,9 +182,10 @@ void ZSTD::compress_file()
         } while (!finished);
 
         CHECK(input.pos == input.size,
-            "ZSTD: zstd only returns 0 when the input is completely consumed!");
+              "ZSTD: zstd only returns 0 when the input is completely consumed!");
 
-        if (last_chunk) {
+        if (last_chunk)
+        {
             break;
         }
     }
@@ -177,7 +196,8 @@ void ZSTD::compress_file()
  */
 void ZSTD::decompress_string()
 {
-    if (mInput.empty() == true) {
+    if (mInput.empty() == true)
+    {
         mLogger->error("Magnus: Please use the correct constructor.");
         throw std::exception();
     }
@@ -201,12 +221,14 @@ void ZSTD::decompress_file()
     size_t const toRead = mBuffInSize;
     size_t read;
 
-    while ((read = fread(mBuffIn, 1, toRead, mFin))) {
+    while ((read = fread(mBuffIn, 1, toRead, mFin)))
+    {
 
-        ZSTD_inBuffer input = { mBuffIn, read, 0 };
+        ZSTD_inBuffer input = {mBuffIn, read, 0};
 
-        while (input.pos < input.size) {
-            ZSTD_outBuffer output = { mBuffOut, mBuffOutSize, 0 };
+        while (input.pos < input.size)
+        {
+            ZSTD_outBuffer output = {mBuffOut, mBuffOutSize, 0};
 
             size_t const ret = ZSTD_decompressStream(mDctx, &output, &input);
             CHECK_ZSTD(ret);
@@ -221,7 +243,8 @@ void ZSTD::decompress_file()
  */
 std::string_view ZSTD::get_string_view()
 {
-    if (mBuffer.empty()) {
+    if (mBuffer.empty())
+    {
         mLogger->error("ZSTD: There isn't any buffer to return.");
         throw std::exception();
     }
@@ -234,7 +257,8 @@ std::string_view ZSTD::get_string_view()
  */
 std::string ZSTD::get_string()
 {
-    if (mBuffer.empty()) {
+    if (mBuffer.empty())
+    {
         mLogger->error("ZSTD: There isn't any buffer to return.");
         throw std::exception();
     }

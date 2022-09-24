@@ -7,12 +7,14 @@
 #include <string_view>
 #include <utility>
 
-namespace LibMagnus {
+namespace LibMagnus
+{
 /*
  * Stores the related server info.
  */
-struct ServerInfo {
-public:
+struct ServerInfo
+{
+    public:
     std::string_view AddressString;
 
     sockaddr_in Address;

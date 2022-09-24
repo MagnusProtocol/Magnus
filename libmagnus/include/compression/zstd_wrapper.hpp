@@ -3,15 +3,18 @@
 #include <filesystem>
 #include <zstd.h>
 
-namespace LibMagnus::Compression {
+namespace LibMagnus::Compression
+{
 
-enum MODES {
+enum MODES
+{
     COMPRESS = 0x123,
     DECOMPRESS = 0x234,
 };
 
-class ZSTD : public CompressionBase {
-private:
+class ZSTD : public CompressionBase
+{
+    private:
     // String buffer for storing the comrpessed data
     std::string mBuffer;
     // String view for taking in a string to compress
@@ -60,7 +63,7 @@ private:
     // Spdlog logger, multithreaded stderr
     std::shared_ptr<spdlog::logger> mLogger;
 
-public:
+    public:
     /*
      * @brief: Compress/Decompress a std::string_view; to obtain the result of this function, call
      * the applicable getter function.

@@ -1,6 +1,7 @@
 #include "sockets/serverinfo.hpp"
 
-namespace LibMagnus {
+namespace LibMagnus
+{
 void ServerInfo::SetAddress(std::string_view address)
 {
     memset(&this->Address, 0, sizeof(this->Address));
@@ -36,14 +37,12 @@ void ServerInfo::SetPort(uint16_t port)
     this->Address.sin_port = htons(this->Port);
 }
 
-ServerInfo::ServerInfo()
-    : Port(0)
+ServerInfo::ServerInfo() : Port(0)
 {
     memset(&this->Address, 0, sizeof(this->Address));
 }
 
-ServerInfo::ServerInfo(std::string_view address, uint16_t port)
-    : Port(port)
+ServerInfo::ServerInfo(std::string_view address, uint16_t port) : Port(port)
 {
     this->SetAddress(address);
     this->SetPort(port);

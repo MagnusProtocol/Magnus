@@ -14,8 +14,10 @@
 #include <xed25519.h>
 using namespace CryptoPP;
 
-namespace LibMagnus {
-struct Keys {
+namespace LibMagnus
+{
+struct Keys
+{
     // Diffie-hellman key, initalized by class constructor
     ECDH<ECP>::Domain dh_key;
     // Private/public keys
@@ -29,8 +31,9 @@ struct Keys {
     }
 };
 
-class Encryption {
-private:
+class Encryption
+{
+    private:
     // Private/Public keys
     Keys mKeys;
     SecByteBlock mSharedKey;
@@ -40,7 +43,7 @@ private:
     // Called in every constructor, sets common values.
     void setup();
 
-public:
+    public:
     /*
      * @brief: return the keys stored in the private class variable.
      * @returns: returns a fully populated object of type, "Keys"
@@ -59,11 +62,11 @@ public:
 
     // AES-256
     void encrypt_data_aes_256(SecByteBlock& key, std::string& data, byte* out_data,
-        const CryptoPP::byte* iv);
+                              const CryptoPP::byte* iv);
     void decrypt_data_aes_256(SecByteBlock& key, std::string& data, byte* out_data,
-        const CryptoPP::byte* iv);
+                              const CryptoPP::byte* iv);
     void decrypt_data_aes_256(SecByteBlock& key, byte* data, size_t length, byte* out_data,
-        const CryptoPP::byte* iv);
+                              const CryptoPP::byte* iv);
 
     Encryption();
     ~Encryption();

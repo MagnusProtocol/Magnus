@@ -1,19 +1,15 @@
 #include "sockets/server.hpp"
 
-namespace LibMagnus {
-Server::Server()
-    : Bound(false)
-    , Running(false)
+namespace LibMagnus
+{
+Server::Server() : Bound(false), Running(false)
 {
     this->Buffer.reserve(this->MaxBufferLength);
 
     this->Initialize();
 }
 
-Server::Server(std::string_view& address)
-    : Bound(false)
-    , Running(false)
-    , AddressString(address)
+Server::Server(std::string_view& address) : Bound(false), Running(false), AddressString(address)
 {
     this->Buffer.reserve(this->MaxBufferLength);
 
@@ -32,7 +28,8 @@ Server& Server::Bind(sockaddr_in& address)
 
 Server& Server::Initialize()
 {
-    if (!this->Bound) {
+    if (!this->Bound)
+    {
         this->Address.sin_family = AF_INET;
         this->Address.sin_addr.s_addr = htonl(INADDR_ANY);
         this->Address.sin_port = htons(this->Port);
@@ -100,7 +97,8 @@ int Server::Receive()
     this->Buffer.clear();
 
     ssize_t recv_bytes = 0;
-    if ((recv_bytes = recv(this->ConnectionID, this->Buffer.data(), this->MaxBufferLength, 0)) < 0) {
+    if ((recv_bytes = recv(this->ConnectionID, this->Buffer.data(), this->MaxBufferLength, 0)) < 0)
+    {
         perror("Recv failed. ");
         exit(1);
     }
@@ -110,7 +108,8 @@ int Server::Receive()
 
 Server& Server::Send(int bytes)
 {
-    if (send(this->ConnectionID, this->Buffer.data(), bytes, 0) < 0) {
+    if (send(this->ConnectionID, this->Buffer.data(), bytes, 0) < 0)
+    {
         std::cout << "Server response failure.";
     }
 
@@ -130,7 +129,8 @@ int Server::Read()
 {
     int bytes = 0;
 
-    while ((bytes = this->Receive()) > 0) {
+    while ((bytes = this->Receive()) > 0)
+    {
         std::cout << "Recieved buffer: " << this->Buffer.c_str() << '\n'
                   << "Stack Size: " << this->BufferStack.size() << '\n';
 
@@ -143,7 +143,8 @@ int Server::Read()
 
 void Server::Start()
 {
-    if (this->Running) {
+    if (this->Running)
+    {
 #ifdef LOG
         std::cout << "The server is already running." << '\n';
 #endif
@@ -154,8 +155,10 @@ void Server::Start()
 
     this->Accept();
 
-    while (this->Running) {
-        if (this->Read() <= 0) {
+    while (this->Running)
+    {
+        if (this->Read() <= 0)
+        {
             this->Accept();
         }
     }
