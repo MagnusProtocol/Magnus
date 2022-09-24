@@ -8,6 +8,17 @@ set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_MACOSX_RPATH 1)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# GTest
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG release-1.12.1
+)
+# For Windows: Prevent overriding the parent project's compiler/linker settings
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
 # Get all C++ files
 file(GLOB MAGNUS_SOURCES
     magnus/source/*.cpp
@@ -88,6 +99,18 @@ target_compile_options(libmagnus PRIVATE
 target_link_options(libmagnus PRIVATE
     #-fsanitize=address
 )
+
+# Tests
+add_executable(Tests
+    tests/encryption.cpp
+    tests/io_mmap.cpp)
+target_link_libraries(Tests
+    GTest::gtest_main
+    libmagnus
+)
+include(GoogleTest)
+gtest_discover_tests(Tests)
+
 
 # Client
 add_executable(client magnus/source/client.cpp)
