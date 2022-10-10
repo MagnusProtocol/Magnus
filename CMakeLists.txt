@@ -40,21 +40,12 @@ set(ZSTD_BUILD_PROGRAMS OFF)
 # add zstd
 add_subdirectory(deps/zstd/build/cmake)
 
-set(LZ4_BUNDLED_MODE OFF)
-set(BUILD_STATIC_LIBS OFF)
-set(LZ4_BUILD_CLI OFF)
-# add lz4
-add_subdirectory(deps/lz4/build/cmake)
-
 # add blake3
 add_subdirectory(deps/BLAKE3/c)
 
 # add spdlog
 add_subdirectory(deps/spdlog)
 
-# add cryptopp
-set(BUILD_TESTING OFF)
-set(BUILD_STATIC OFF)
 
 add_subdirectory(deps/cryptopp-cmake)
 # Libmagnus (backend/protocol)
@@ -70,8 +61,7 @@ target_include_directories(libmagnus PUBLIC
 target_link_libraries(libmagnus PUBLIC
     blake3-shared
     libzstd_shared
-    lz4_shared
-    cryptopp-shared
+    cryptopp
     spdlog
 )
 
