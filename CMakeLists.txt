@@ -1,111 +1,93 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.22)
 project("Magnus")
-# Use clang and lincxx
+
 # Set C++ options
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_MACOSX_RPATH 1)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # GTest
+set(GTEST_GIT_TAG v1.13.0)
 include(FetchContent)
 FetchContent_Declare(
   googletest
   GIT_REPOSITORY https://github.com/google/googletest.git
-  GIT_TAG release-1.12.1
+  GIT_TAG ${GTEST_GIT_TAG}
 )
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
+message("-- Fetched GTest version: ${GTEST_GIT_TAG}")
 
 # Get all C++ files
-file(GLOB MAGNUS_SOURCES
-    magnus/source/*.cpp
+file(GLOB_RECURSE LIBMAGNUS_SOURCES
+    libmagnus/*.cpp
+    libmagnus/sockets/*.cpp
+    libmagnus/compression/*.cpp
+    libmagnus/hashing/*.cpp
+    libmagnus/encryption/*.cpp
+    libmagnus/keygen/*.cpp
 )
 
-file(GLOB LIBMAGNUS_SOURCES
-    libmagnus/source/*.cpp
-    libmagnus/source/sockets/*.cpp
-    libmagnus/source/compression/*.cpp
-    libmagnus/source/hashing/*.cpp
-    libmagnus/source/slicing/*.cpp
-    libmagnus/source/utils/*.cpp
-    libmagnus/source/encryption/*.cpp
-)
-# Don't build the zstd static libs
+find_package(OpenSSL REQUIRED)
+if (OPENSSL_FOUND)
+    message("-- OpenSSL Version: ${OPENSSL_VERSION}")
+    if (NOT(OPENSSL_CRYPTO_LIBRARY) OR NOT(OPENSSL_SSL_LIBRARIES))
+        message(FATAL_ERROR "-- Could not find OpenSSL::Crypto OR OpenSSL::SSL module(s)")
+    endif()
+else()
+    message(FATAL_ERROR "-- Could not find OpenSSL")
+endif()
+
+# Don't build the zstd static libs & cli
 set(ZSTD_BUILD_STATIC OFF)
-# Don't build the zstd cli
 set(ZSTD_BUILD_PROGRAMS OFF)
-# add zstd
 add_subdirectory(deps/zstd/build/cmake)
 
-# add blake3
-add_subdirectory(deps/BLAKE3/c)
-
-# add spdlog
 add_subdirectory(deps/spdlog)
 
-
-add_subdirectory(deps/cryptopp-cmake)
 # Libmagnus (backend/protocol)
-
-# Add all the sources
 add_library(libmagnus ${LIBMAGNUS_SOURCES})
+
 # Add all the includes
 target_include_directories(libmagnus PUBLIC 
-    libmagnus/include
+    libmagnus/
     deps/zstd/lib
 )
+
 # Link all the needed libraries
 target_link_libraries(libmagnus PUBLIC
-    blake3-shared
     libzstd_shared
-    cryptopp
     spdlog
-)
-
-# Precompile reused headers
-target_precompile_headers(libmagnus
-  PUBLIC
-    libmagnus/include/magnus.hpp
-    deps/spdlog/include/spdlog/spdlog.h
-  PRIVATE
-    <iostream>
-    <filesystem>
-    <vector>
-    <string>
-    <string_view>
-    <unordered_map>
+    OpenSSL::Crypto
+    OpenSSL::SSL
 )
 
 # Enable some compiler/linker options.
 target_compile_options(libmagnus PRIVATE
-    -Wall -DADDRESS_SANITIZER
-    
-	#-Walloca -Wcast-qual -Wconversion
-   # -fsanitize=address -fno-omit-frame-pointer
-)
-target_link_options(libmagnus PRIVATE
-    #-fsanitize=address
+    -Wall -DADDRESS_SANITIZER -Wextra
 )
 
+# Get all C++ files
+file(GLOB_RECURSE TESTS_SOURCES
+    tests/*.cpp
+)
 # Tests
-add_executable(Tests
-    tests/encryption.cpp
-    tests/io_mmap.cpp)
+add_executable(Tests ${TESTS_SOURCES})
+
 target_link_libraries(Tests
     GTest::gtest_main
     libmagnus
 )
+
 include(GoogleTest)
 gtest_discover_tests(Tests)
 
-
 # Client
-add_executable(client magnus/source/client.cpp)
+add_executable(client magnus/client.cpp)
 target_link_libraries(client PRIVATE libmagnus)
 
 # Server
-add_executable(server magnus/source/server.cpp)
+add_executable(server magnus/server.cpp)
 target_link_libraries(server PRIVATE libmagnus)
