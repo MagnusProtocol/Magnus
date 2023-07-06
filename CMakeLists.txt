@@ -79,7 +79,7 @@ add_executable(Tests ${TESTS_SOURCES})
 target_link_libraries(Tests
         GTest::gtest_main
         libmagnus
-        )
+)
 
 include(GoogleTest)
 gtest_discover_tests(Tests)
@@ -94,7 +94,7 @@ if (CMAKE_CXX_CPPCHECK)
                 "--inconclusive"
                 "--force" 
                 "--inline-suppr"
-                )
+        )
 else()
         message(FATAL_ERROR "-- Failed to find cppcheck binary. Please add it to path/install it.")
 endif()

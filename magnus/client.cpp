@@ -1,14 +1,17 @@
 #include <iostream>
 #include <magnus.hpp>
 
-int main() {
-        std::string input = "The Industrial Revolution and its consequences have been a disaster for the human race. They have greatly increased the life-expectancy of those of us who live in 'advanced' countries, but they have destabilized society, have made life unfulfilling, have subjected human beings to indignities, have led to widespread psychological suffering (in the Third World to physical suffering as well) and have inflicted severe damage on the natural world. The continued development of technology will worsen the situation. It will certainly subject human beings to greater indignities and inflict greater damage on the natural world, it will probably lead to greater social disruption and psychological suffering, and it may lead to increased physical suffering even in 'advanced' countries.";
-
+int main(int argc, char** argv) {
         ZSTDCompressor comp = ZSTDCompressor();
-        auto compressed_string = comp.compress(input);
-        auto decompressed_string = comp.decompress(compressed_string);
 
-        std::cout << decompressed_string << std::endl;
+        std::filesystem::path input = argv[1];
+        auto compressed = comp.compress(input);
+
+        auto outfile = input.string() + ".zst";
+        std::cout << outfile << std::endl;
+        std::filesystem::path comp_file = outfile;
+
+        auto decompressed = comp.decompress(comp_file);
 
         return 0;
 }

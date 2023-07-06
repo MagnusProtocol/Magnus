@@ -1,3 +1,5 @@
 build/
 .vscode/
 .ccls-cache/
+assets/to_compress_example.txt.decomp
+assets/to_compress_example.txt.zst

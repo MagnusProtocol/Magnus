@@ -1,11 +1,12 @@
 #pragma once
 
 #include <compression/compression.hpp>
+#include <zstd.h>
 
 class ZSTDCompressor : Compressor {
-public:        
-        ZSTDCompressor() = default;
-        ~ZSTDCompressor() = default;
+public:
+        ZSTDCompressor();
+        ~ZSTDCompressor();
 
         /*
          * @brief: Compress a string
@@ -48,6 +49,33 @@ public:
          * @returns Result of the operation (int)
          */
         int decompress(std::vector<std::filesystem::path> paths);
+private:
+        int comp_level;
+
+        // Temp helper func
+        size_t fread_or_die(void* buffer, size_t sizeToRead, FILE* file) {
+                size_t const readSize = fread(buffer, 1, sizeToRead, file);
+                if (readSize == sizeToRead) return readSize;   /* good */
+                if (feof(file)) return readSize;   /* good, reached end of file */
+                /* error */
+                perror("fread");
+                exit(-1);
+        }
+        size_t fwrite_or_die(const void* buffer, size_t sizeToWrite, FILE* file) {
+                size_t const writtenSize = fwrite(buffer, 1, sizeToWrite, file);
+                if (writtenSize == sizeToWrite) return sizeToWrite;   /* good */
+                /* error */
+                perror("fwrite");
+                exit(-1);
+        }
+
+        ZSTD_CCtx* ZSTDCContext;
+        ZSTD_DCtx* ZSTDDContext;
+
+#if defined(ZSTD_STATIC_LINKING_ONLY)
+        ZSTD_threadPool *ZSTDCPool;
+        ZSTD_threadPool *ZSTDDPool;
+#endif
 };
 
 /*
