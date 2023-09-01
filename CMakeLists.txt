@@ -54,7 +54,7 @@ add_library(libmagnus ${LIBMAGNUS_SOURCES})
 target_include_directories(libmagnus PUBLIC 
         libmagnus/
         deps/zstd/lib
-        )
+)
 
 # Link all the needed libraries
 target_link_libraries(libmagnus PUBLIC
@@ -62,7 +62,7 @@ target_link_libraries(libmagnus PUBLIC
         spdlog
         OpenSSL::Crypto
         OpenSSL::SSL
-        )
+)
 
 # Enable some compiler/linker options.
 target_compile_options(libmagnus PRIVATE

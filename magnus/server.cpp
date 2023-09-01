@@ -1,7 +1,5 @@
 #include <iostream>
-#include <magnus.hpp>
+#include <openssl/ec.h>
+#include <openssl/evp.h>
 
-int main() {
-        std::cout << "Server" << std::endl;
-        return 0;
-}
+int main() { std::cout << "wtf" << std::endl; }

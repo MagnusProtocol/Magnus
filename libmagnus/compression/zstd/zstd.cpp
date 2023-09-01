@@ -4,7 +4,7 @@
 // TODO: Switch ZSTD File functions to C++ STDLIB-IO
 #include <cstdio>
 
-/*
+/**
  * @brief: Constructor for the ZSTDCompressor class.
  *         It currently creates the ZSTD Context
  */
@@ -26,7 +26,7 @@ ZSTDCompressor::ZSTDCompressor() {
 #endif
 }
 
-/*
+/**
  * @brief: Destructor for the ZSTDCompressor class.
  *         It currently cleans up the ZSTD Context
  */
@@ -35,7 +35,7 @@ ZSTDCompressor::~ZSTDCompressor() {
         ZSTD_freeDCtx(this->ZSTDDContext);
 }
 
-/*
+/**
  * @brief: Compress a string
  * @param input: Reference to a string that is to be compressed
  * @returns Compressed string
@@ -61,7 +61,7 @@ std::string ZSTDCompressor::compress(std::string& input) {
         return comp_string;
 }
 
-/*
+/**
  * @brief: Decompress a string
  * @param input: Reference to a string that is to be decompressed
  * @returns Decompressed string
@@ -91,7 +91,7 @@ std::string ZSTDCompressor::decompress(std::string& input) {
         return decomp_string;
 }
 
-/*
+/**
  * @brief: Compresses a file
  * @param path: std::filesystem::path to the file that is to be compressed
  * @returns Result of the operation (int)
@@ -104,7 +104,7 @@ int ZSTDCompressor::compress(std::filesystem::path& path) {
 
         int nbThreads = 8;
 
-        /*
+        /**
          * Create the input and output buffers.
          */
         size_t const buff_in_size = ZSTD_CStreamInSize();
@@ -120,7 +120,7 @@ int ZSTDCompressor::compress(std::filesystem::path& path) {
         CHECK(r == 0, "ZSTD_CCtx_refThreadPool failed!");
 #endif
 
-        /*
+        /**
          * Set the compression level, and enable the checksum.
          */
         CHECK_ZSTD(ZSTD_CCtx_setParameter(
@@ -130,7 +130,7 @@ int ZSTDCompressor::compress(std::filesystem::path& path) {
         CHECK_ZSTD(ZSTD_CCtx_setParameter(this->ZSTDCContext, ZSTD_c_nbWorkers,
                                           nbThreads));
 
-        /*
+        /**
          * This loop reads from the input file, compresses that entire chunk,
          * and writes all output produced to the output file.
          */
@@ -138,7 +138,7 @@ int ZSTDCompressor::compress(std::filesystem::path& path) {
         for (;;) {
                 size_t read = fread(buff_in, 1, to_read, fin);
 
-                /*
+                /**
                  * Select the flush mode.
                  * If the read may not be finished (read == to_read) we use
                  * ZSTD_e_continue. If this is the last chunk, we use
@@ -149,7 +149,7 @@ int ZSTDCompressor::compress(std::filesystem::path& path) {
                 int const last_chunk = (read < to_read);
                 ZSTD_EndDirective const mode =
                     last_chunk ? ZSTD_e_end : ZSTD_e_continue;
-                /*
+                /**
                  * Set the input buffer to what we just read.
                  * We compress until the input buffer is empty, each time
                  * flushing the output.
@@ -157,7 +157,7 @@ int ZSTDCompressor::compress(std::filesystem::path& path) {
                 ZSTD_inBuffer input = {buff_in, read, 0};
                 int finished;
                 do {
-                        /*
+                        /**
                          * Compress into the output buffer and write all of the
                          * output to the file so we can reuse the buffer next
                          * iteration.
@@ -168,7 +168,7 @@ int ZSTDCompressor::compress(std::filesystem::path& path) {
                         CHECK_ZSTD(remaining);
 
                         fwrite(buff_out, 1, output.pos, fout);
-                        /*
+                        /**
                          * If we're on the last chunk we're finished when zstd
                          * returns 0, which means its consumed all the input AND
                          * finished the frame. Otherwise, we're finished when
@@ -194,7 +194,7 @@ int ZSTDCompressor::compress(std::filesystem::path& path) {
         return 0;
 }
 
-/*
+/**
  * @brief: Decompress a file
  * @param path: std::filesystem::path to the file that is to be decompressed
  * @returns Result of the operation (int)
@@ -206,7 +206,7 @@ int ZSTDCompressor::decompress(std::filesystem::path& path) {
         FILE* const fin = fopen(path.c_str(), "rb");
         FILE* const fout = fopen(outfile.c_str(), "wb");
 
-        /*
+        /**
          * Create IO Buffers
          */
         size_t const buff_in_size = ZSTD_DStreamInSize();
@@ -217,7 +217,7 @@ int ZSTDCompressor::decompress(std::filesystem::path& path) {
         void* const buff_out = malloc(buff_out_size);
         memset(buff_out, 0, buff_out_size);
 
-        /* This loop assumes that the input file is one or more concatenated
+        /** This loop assumes that the input file is one or more concatenated
          * zstd streams. This example won't work if there is trailing non-zstd
          * data at the end, but streaming decompression in general handles this
          * case. ZSTD_decompressStream() returns 0 exactly when the frame is
@@ -230,20 +230,20 @@ int ZSTDCompressor::decompress(std::filesystem::path& path) {
         while ((read = fread(buff_in, 1, to_read, fin))) {
                 is_empty = 0;
                 ZSTD_inBuffer input = {buff_in, read, 0};
-                /* Given a valid frame, zstd won't consume the last byte of the
+                /** Given a valid frame, zstd won't consume the last byte of the
                  * frame until it has flushed all of the decompressed data of
                  * the frame. Therefore, instead of checking if the return code
                  * is 0, we can decompress just check if input.pos < input.size.
                  */
                 while (input.pos < input.size) {
                         ZSTD_outBuffer output = {buff_out, buff_out_size, 0};
-                        /* The return code is zero if the frame is complete, but
-                         * there may be multiple frames concatenated together.
-                         * Zstd will automatically reset the context when a
-                         * frame is complete. Still, calling ZSTD_DCtx_reset()
-                         * can be useful to reset the context to a clean state,
-                         * for instance if the last decompression call returned
-                         * an error.
+                        /** The return code is zero if the frame is complete,
+                         * but there may be multiple frames concatenated
+                         * together. Zstd will automatically reset the context
+                         * when a frame is complete. Still, calling
+                         * ZSTD_DCtx_reset() can be useful to reset the context
+                         * to a clean state, for instance if the last
+                         * decompression call returned an error.
                          */
                         size_t const ret = ZSTD_decompressStream(
                             this->ZSTDDContext, &output, &input);
@@ -259,7 +259,7 @@ int ZSTDCompressor::decompress(std::filesystem::path& path) {
         }
 
         if (last_ret != 0) {
-                /* The last return value from ZSTD_decompressStream did not end
+                /** The last return value from ZSTD_decompressStream did not end
                  * on a frame, but we reached the end of the file! We assume
                  * this is an error, and the input was truncated.
                  */
@@ -275,7 +275,7 @@ int ZSTDCompressor::decompress(std::filesystem::path& path) {
         return 0;
 }
 
-/*
+/**
  * @brief: Compresses multiple files
  * @param path: std::vector of std::filesystem::path to the files that are to be
  * compressed
@@ -289,7 +289,7 @@ int ZSTDCompressor::compress(std::vector<std::filesystem::path> paths) {
         return res;
 }
 
-/*
+/**
  * @brief: Decompresses multiple files
  * @param path: std::vector of std::filesystem::path to the files that are to be
  * decompressed
