@@ -1,5 +1,8 @@
 build/
 .vscode/
+.vs/
 .ccls-cache/
+cmake-build-debug/
+.idea/
 assets/to_compress_example.txt.decomp
 assets/to_compress_example.txt.zst
