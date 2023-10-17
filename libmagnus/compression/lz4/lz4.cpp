@@ -102,7 +102,8 @@ out:
                 printf("LZ4F_writeClose: %s\n", LZ4F_getErrorName(ret));
                 return 1;
         }
-        fflush(f_out);
+        fclose(f_in);
+        fclose(f_out);
         return 0;
 }
 int LZ4Compressor::decompress(std::filesystem::path& path) {
@@ -144,7 +145,6 @@ int LZ4Compressor::decompress(std::filesystem::path& path) {
                         printf("write error!\n");
                         goto out;
                 }
-                fflush(f_out);
         }
 
 out:
@@ -157,6 +157,8 @@ out:
         if (ret) {
                 return 1;
         }
+        fclose(f_in);
+        fclose(f_out);
 
         return 0;
 }
