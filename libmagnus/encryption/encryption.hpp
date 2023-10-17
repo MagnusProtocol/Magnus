@@ -8,11 +8,11 @@
 
 class Encryptor {
 public:
-        /*
-         * @brief: ncrypt a string
-         * @param input: Reference to a string that is to be compressed
-         * @returns Compressed string
-         */
-        virtual void encrypt() = 0;
-        virtual void decrypt() = 0;
+	/*
+	 * @brief: ncrypt a string
+	 * @param input: Reference to a string that is to be compressed
+	 * @returns Compressed string
+	 */
+	virtual void encrypt() = 0;
+	virtual void decrypt() = 0;
 };

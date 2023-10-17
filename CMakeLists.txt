@@ -44,74 +44,59 @@ endif()
 set(ZSTD_BUILD_STATIC OFF)
 set(ZSTD_BUILD_PROGRAMS OFF)
 add_subdirectory(deps/zstd/build/cmake)
-# Don't build the lz4 static libs
-set(BUILD_STATIC_LIBS OFF)
+
+# LZ4 config
+set(LZ4_BUNDLED_MODE OFF)
+set(BUILD_STATIC_LIBS ON)
+set(LZ4_BUILD_CLI OFF)
+
+# add lz4
 add_subdirectory(deps/lz4/build/cmake)
 
 
-add_subdirectory(deps/spdlog)
-
 # Libmagnus (backend/protocol)
-add_library(libmagnus ${LIBMAGNUS_SOURCES})
+add_library(magnus ${LIBMAGNUS_SOURCES})
 
 # Add all the includes
-target_include_directories(libmagnus PUBLIC
+target_include_directories(magnus PUBLIC
         libmagnus/
         deps/zstd/lib
-        deps/lz4/lib
-
 )
 
 # Link all the needed libraries
-target_link_libraries(libmagnus PUBLIC
+target_link_libraries(magnus PUBLIC
         libzstd_shared
-        spdlog
+        lz4_static
         OpenSSL::Crypto
         OpenSSL::SSL
 )
 
 # Enable some compiler/linker options.
-target_compile_options(libmagnus PRIVATE
-        -Wall -DADDRESS_SANITIZER -Wextra
+target_compile_options(magnus PRIVATE
+        -Wall -fsanitize=address -Wextra
 )
+target_link_options(magnus PRIVATE -fsanitize=address)
 
 # Get all C++ files
 file(GLOB_RECURSE TESTS_SOURCES
         tests/*.cpp
 )
 # Tests
-add_executable(Tests ${TESTS_SOURCES}
-        tests/lz4_string_compression.cpp
-        tests/lz4_file_operations.cpp
-)
+add_executable(Tests ${TESTS_SOURCES})
 
 target_link_libraries(Tests
         GTest::gtest_main
-        libmagnus
+        magnus
 )
 
 include(GoogleTest)
 gtest_discover_tests(Tests)
 
-# cppcheck
-find_program(CMAKE_CXX_CPPCHECK NAMES cppcheck)
-if (CMAKE_CXX_CPPCHECK)
-    message("-- cppcheck found!")
-    list(
-            APPEND CMAKE_CXX_CPPCHECK
-            "--enable=warning"
-            "--inconclusive"
-            "--force"
-            "--inline-suppr"
-    )
-else()
-    message(FATAL_ERROR "-- Failed to find cppcheck binary. Please add it to path/install it.")
-endif()
 
 # Client
 add_executable(client magnus/client.cpp)
-target_link_libraries(client PRIVATE libmagnus)
+target_link_libraries(client PRIVATE magnus)
 
 # Server
 add_executable(server magnus/server.cpp)
-target_link_libraries(server PRIVATE libmagnus)
+target_link_libraries(server PRIVATE magnus)

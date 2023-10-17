@@ -1,2 +1,2 @@
-FILES="$(find libmagnus magnus | grep -E ".*(\.ino|\.cpp|\.c|\.h|\.hpp|\.hh)")"
+FILES="$(find libmagnus magnus tests | grep -E ".*(\.ino|\.cpp|\.c|\.h|\.hpp|\.hh)")"
 clang-format --verbose -i -style=file $FILES

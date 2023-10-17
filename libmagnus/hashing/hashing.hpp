@@ -2,5 +2,5 @@
 
 class Hashing {
 public:
-        virtual void hash() = 0;
+	virtual void hash() = 0;
 };
