@@ -3,6 +3,8 @@
 #include <lz4.h>
 #include <string>
 #include <compression/compression.hpp>
+#include "lz4file.h"
+
 
 class LZ4Compressor  {
 public:
@@ -22,7 +24,7 @@ public:
          * @returns Decompressed string
          */
         std::string decompress(std::string& input, int src_size);
-
+        int filecompress(FILE* inp, FILE* out);
 
 };
 

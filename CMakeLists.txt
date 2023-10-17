@@ -52,8 +52,7 @@ add_subdirectory(deps/lz4/build/cmake)
 add_subdirectory(deps/spdlog)
 
 # Libmagnus (backend/protocol)
-add_library(libmagnus ${LIBMAGNUS_SOURCES}
-        libmagnus/compression/lz4/lz4.cpp)
+add_library(libmagnus ${LIBMAGNUS_SOURCES})
 
 # Add all the includes
 target_include_directories(libmagnus PUBLIC
