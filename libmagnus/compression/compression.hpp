@@ -20,6 +20,7 @@ public:
          */
         virtual std::string decompress(std::string& input) = 0;
 
+
         /**
          * @brief: Compresses a file
          * @param path: std::filesystem::path to the file that is to be

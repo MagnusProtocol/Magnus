@@ -59,6 +59,7 @@ target_include_directories(libmagnus PUBLIC
         libmagnus/
         deps/zstd/lib
         deps/lz4/lib
+
 )
 
 # Link all the needed libraries
@@ -80,7 +81,9 @@ file(GLOB_RECURSE TESTS_SOURCES
 )
 # Tests
 add_executable(Tests ${TESTS_SOURCES}
-        tests/lz4_string_compression.cpp)
+        tests/lz4_string_compression.cpp
+        tests/lz4_file_operations.cpp
+)
 
 target_link_libraries(Tests
         GTest::gtest_main
