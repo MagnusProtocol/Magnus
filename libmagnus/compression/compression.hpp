@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <string>
+#include <vector>
 
 class Compressor {
 public:
@@ -18,6 +19,7 @@ public:
          * @returns Decompressed string
          */
         virtual std::string decompress(std::string& input) = 0;
+
 
         /**
          * @brief: Compresses a file

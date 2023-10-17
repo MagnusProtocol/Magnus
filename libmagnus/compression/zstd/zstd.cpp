@@ -1,6 +1,7 @@
 #include <compression/zstd/zstd.hpp>
 #include <iostream>
 #include <zstd.h>
+#include <string.h>
 // TODO: Switch ZSTD File functions to C++ STDLIB-IO
 #include <cstdio>
 
@@ -99,7 +100,7 @@ std::string ZSTDCompressor::decompress(std::string& input) {
 int ZSTDCompressor::compress(std::filesystem::path& path) {
         auto outfile = path.string() + ".zst";
 
-        FILE* const fin = fopen(path.c_str(), "rb");
+        FILE* const fin = fopen(path.string().c_str(), "rb");
         FILE* const fout = fopen(outfile.c_str(), "wb");
 
         int nbThreads = 8;
@@ -203,8 +204,8 @@ int ZSTDCompressor::decompress(std::filesystem::path& path) {
         auto outfile = path;
         outfile.replace_extension("decomp");
 
-        FILE* const fin = fopen(path.c_str(), "rb");
-        FILE* const fout = fopen(outfile.c_str(), "wb");
+        FILE* const fin = fopen(path.string().c_str(), "rb");
+        FILE* const fout = fopen(outfile.string().c_str(), "wb");
 
         /**
          * Create IO Buffers
