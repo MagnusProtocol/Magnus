@@ -21,8 +21,16 @@ TEST(ZSTDCompressor, ZSTDStringDecompressTest) {
 		"suffering even in 'advanced' countries.";
 
 	ZSTDCompressor comp = ZSTDCompressor();
-	auto compressed_string = comp.compress(input);
-	auto decompressed_string = comp.decompress(compressed_string);
+
+	auto compressed_string = std::string();
+	auto decompressed_string = std::string();
+
+	try {
+		compressed_string = comp.compress(input);
+		decompressed_string = comp.decompress(compressed_string);
+	} catch (...) {
+		throw;
+	}
 
 	EXPECT_EQ(decompressed_string, input);
 }

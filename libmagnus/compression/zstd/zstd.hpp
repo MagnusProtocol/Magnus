@@ -13,14 +13,14 @@ public:
 	 * @param input: Reference to a string that is to be compressed
 	 * @returns Compressed string
 	 */
-	std::string compress(std::string& input);
+	std::string compress(std::string_view input);
 
 	/**
 	 * @brief: Decompress a string
 	 * @param input: Reference to a string that is to be decompressed
 	 * @returns Decompressed string
 	 */
-	std::string decompress(std::string& input);
+	std::string decompress(std::string_view input);
 
 	/**
 	 * @brief: Compresses a file
@@ -55,35 +55,10 @@ public:
 	int decompress(std::vector<std::filesystem::path> paths);
 
 private:
-	int comp_level;
-
-	// Temp helper func
-	size_t fread_or_die(void* buffer, size_t sizeToRead, FILE* file) {
-		size_t const readSize = fread(buffer, 1, sizeToRead, file);
-		if (readSize == sizeToRead)
-			return readSize; /** good */
-		if (feof(file))
-			return readSize; /** good, reached end of file */
-		/** error */
-		perror("fread");
-		exit(-1);
-	}
-	size_t fwrite_or_die(const void* buffer, size_t sizeToWrite, FILE* file) {
-		size_t const writtenSize = fwrite(buffer, 1, sizeToWrite, file);
-		if (writtenSize == sizeToWrite)
-			return sizeToWrite; /** good */
-		/** error */
-		perror("fwrite");
-		exit(-1);
-	}
+	static constexpr int comp_level = 4;
 
 	ZSTD_CCtx* ZSTDCContext;
 	ZSTD_DCtx* ZSTDDContext;
-
-#if defined(ZSTD_STATIC_LINKING_ONLY)
-	ZSTD_threadPool* ZSTDCPool;
-	ZSTD_threadPool* ZSTDDPool;
-#endif
 };
 
 /**

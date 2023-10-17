@@ -25,7 +25,13 @@ TEST(ZSTDCompressor, ZSTDStringCompressionTest) {
 		"suffering even in 'advanced' countries.";
 	ZSTDCompressor comp = ZSTDCompressor();
 
-	auto compressed_string = comp.compress(input);
+	auto compressed_string = std::string();
+	try {
+		compressed_string = comp.compress(input);
+	} catch (...) {
+		throw;
+	}
+
 	// Put in a newline so that they're equal
 	compressed_string.push_back('\n');
 

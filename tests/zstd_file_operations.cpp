@@ -23,12 +23,18 @@ TEST(ZSTDCompressor, ZSTDFileCompressionAndDecompressionTest) {
 
 	ZSTDCompressor comp = ZSTDCompressor();
 
-	std::filesystem::path input = "../assets/to_compress_example.txt";
-	auto compressed = comp.compress(input);
-
+	std::filesystem::path input("../assets/to_compress_example.txt");
 	std::filesystem::path comp_file = input.string() + ".zst";
 
-	auto decompressed = comp.decompress(comp_file);
+	auto compressed = std::string();
+	auto decompressed = std::string();
+
+	try {
+		compressed = comp.compress(input);
+		decompressed = comp.decompress(comp_file);
+	} catch (...) {
+		throw;
+	}
 
 	std::ifstream zstdfile("../assets/to_compress_example.txt.decomp");
 	std::stringstream decompressed_string;

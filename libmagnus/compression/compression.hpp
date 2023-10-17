@@ -11,14 +11,14 @@ public:
 	 * @param input: Reference to a string that is to be compressed
 	 * @returns Compressed string
 	 */
-	virtual std::string compress(std::string& input) = 0;
+	virtual std::string compress(std::string_view input) = 0;
 
 	/**
 	 * @brief: Decompress a string
 	 * @param input: Reference to a string that is to be decompressed
 	 * @returns Decompressed string
 	 */
-	virtual std::string decompress(std::string& input) = 0;
+	virtual std::string decompress(std::string_view input) = 0;
 
 	/**
 	 * @brief: Compresses a file
@@ -77,3 +77,9 @@ public:
 	 */
 	// virtual std::istream& operator>>(std::istream& is, T& obj);
 };
+
+struct file_deleter {
+	void operator()(std::FILE* fp) { std::fclose(fp); }
+};
+
+using unique_file_t = std::unique_ptr<std::FILE, file_deleter>;
