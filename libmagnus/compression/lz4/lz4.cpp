@@ -60,6 +60,8 @@ int LZ4Compressor::compress(std::filesystem::path& path){
         void* const buf = malloc(CHUNK_SIZE);
         if (!buf) {
                 printf("error: memory allocation failed \n");
+                fclose(f_in);
+                fclose(f_out);
                 return 1;
         }
 
@@ -71,6 +73,8 @@ int LZ4Compressor::compress(std::filesystem::path& path){
         if (LZ4F_isError(ret)) {
                 printf("LZ4F_writeOpen error: %s\n", LZ4F_getErrorName(ret));
                 free(buf);
+                fclose(f_in);
+                fclose(f_out);
                 return 1;
         }
 
@@ -99,6 +103,8 @@ out:
         free(buf);
         if (LZ4F_isError(LZ4F_writeClose(lz4fWrite))) {
                 printf("LZ4F_writeClose: %s\n", LZ4F_getErrorName(ret));
+                fclose(f_in);
+                fclose(f_out);
                 return 1;
         }
         fclose(f_in);
@@ -124,6 +130,9 @@ int LZ4Compressor::decompress(std::filesystem::path& path) {
         if (LZ4F_isError(ret)) {
                 printf("LZ4F_readOpen error: %s\n", LZ4F_getErrorName(ret));
                 free(buf);
+                fclose(f_in);
+                fclose(f_out);
+
                 return 1;
         }
 
@@ -149,10 +158,14 @@ out:
         free(buf);
         if (LZ4F_isError(LZ4F_readClose(lz4fRead))) {
                 printf("LZ4F_readClose: %s\n", LZ4F_getErrorName(ret));
+                fclose(f_in);
+                fclose(f_out);
                 return 1;
         }
 
         if (ret) {
+                fclose(f_in);
+                fclose(f_out);
                 return 1;
         }
         fclose(f_in);
