@@ -1,7 +1,6 @@
 #include "lz4.hpp"
 #include "lz4.h"
 #include <cstring>
-#include <iostream>
 #include <lz4.c>
 #include "lz4frame.c"
 #include "lz4hc.c"
@@ -114,7 +113,6 @@ int LZ4Compressor::decompress(std::filesystem::path& path) {
         FILE* const f_out = fopen(outfile.string().c_str(), "wb");
         assert(f_in != NULL);
         assert(f_out != NULL);
-        std::cout << path;
         LZ4F_errorCode_t ret = LZ4F_OK_NoError;
         LZ4_readFile_t* lz4fRead;
         void* const buf = malloc(CHUNK_SIZE);

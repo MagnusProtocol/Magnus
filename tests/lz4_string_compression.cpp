@@ -22,7 +22,8 @@ TEST(LZ4Compressor, LZ4StringCompressionTest) {
 
         auto cmpstr = compressor.compress(input);
         auto dmpstr = compressor.decompress(cmpstr, input.size());
-        // Put in a newline so that they're equal
+        // Compare decompressed string with input to check if they are the same
         EXPECT_EQ(dmpstr, input);
+        // Check is compressed string size is less than input
         EXPECT_LT(cmpstr.size(), input.size());
 }
