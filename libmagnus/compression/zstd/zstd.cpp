@@ -1,15 +1,10 @@
 #include <compression/zstd/zstd.hpp>
 
-#include <cstdio>
-#include <iostream>
-#include <zstd.h>
+ZSTDCompressor::ZSTDCompressor()
+	: ZSTDCContext(ZSTD_createCCtx()), ZSTDDContext(ZSTD_createDCtx()) {
 
-ZSTDCompressor::ZSTDCompressor() {
-	this->ZSTDCContext = ZSTD_createCCtx();
-	CHECK(this->ZSTDCContext != NULL, "ZSTD_createCCtx() failed!");
-
-	this->ZSTDDContext = ZSTD_createDCtx();
-	CHECK(ZSTDDContext != NULL, "ZSTD_createDCtx() failed!");
+	check(this->ZSTDCContext != nullptr, "ZSTD_createCCtx() failed!");
+	check(this->ZSTDDContext != nullptr, "ZSTD_createDCtx() failed!");
 }
 
 ZSTDCompressor::~ZSTDCompressor() {
@@ -17,22 +12,22 @@ ZSTDCompressor::~ZSTDCompressor() {
 	ZSTD_freeDCtx(this->ZSTDDContext);
 }
 
-std::string ZSTDCompressor::compress(std::string_view input) {
-	size_t comp_buff_size = ZSTD_compressBound(input.size());
+auto ZSTDCompressor::compress(const std::string_view input) -> std::string {
+	const size_t comp_buff_size = ZSTD_compressBound(input.size());
 
 	std::string comp_string(comp_buff_size, ' ');
 
 	const size_t comp_size = ZSTD_compressCCtx(
 		this->ZSTDCContext, comp_string.data(), comp_buff_size, input.data(),
-		input.size(), this->comp_level);
-	CHECK_ZSTD(comp_size);
+		input.size(), ZSTDCompressor::comp_level);
+	check_zstd(comp_size);
 
 	comp_string.resize(comp_size);
 
 	return comp_string;
 }
 
-std::string ZSTDCompressor::decompress(std::string_view input) {
+auto ZSTDCompressor::decompress(const std::string_view input) -> std::string {
 
 	const size_t comp_buff_size =
 		ZSTD_getFrameContentSize(input.data(), input.size());
@@ -46,38 +41,39 @@ std::string ZSTDCompressor::decompress(std::string_view input) {
 	const size_t decomp_size =
 		ZSTD_decompressDCtx(this->ZSTDDContext, decomp_string.data(),
 							comp_buff_size, input.data(), input.size());
-	CHECK_ZSTD(decomp_size);
+	check_zstd(decomp_size);
 
 	decomp_string.resize(decomp_size);
 
 	return decomp_string;
 }
 
-int ZSTDCompressor::compress(std::filesystem::path& path) {
+auto ZSTDCompressor::compress(std::filesystem::path& path) -> int {
 	auto outfile = path.string() + ".zst";
 
-	unique_file_t fin{std::fopen(path.string().c_str(), "rb")};
-	unique_file_t fout{std::fopen(outfile.c_str(), "wb")};
+	const unique_file_t fin{std::fopen(path.string().c_str(), "rb")};
+	const unique_file_t fout{std::fopen(outfile.c_str(), "wb")};
 
-	int nbThreads = 8;
+	const int nbThreads = 8;
 
 	/**
 	 * Create the input and output buffers.
 	 */
-	size_t const buff_in_size = ZSTD_CStreamInSize();
-	auto buff_in = std::make_unique<char[]>(buff_in_size);
+	const size_t buff_in_size = ZSTD_CStreamInSize();
+	std::vector<char> buff_in(buff_in_size, ' ');
 
-	size_t const buff_out_size = ZSTD_CStreamOutSize();
-	auto buff_out = std::make_unique<char[]>(buff_out_size);
+	const size_t buff_out_size = ZSTD_CStreamOutSize();
+	std::vector<char> buff_out(buff_out_size, ' ');
 
 	/**
 	 * Set the compression level, and enable the checksum.
 	 */
-	CHECK_ZSTD(ZSTD_CCtx_setParameter(
-		this->ZSTDCContext, ZSTD_c_compressionLevel, this->comp_level));
-	CHECK_ZSTD(
+	check_zstd(ZSTD_CCtx_setParameter(this->ZSTDCContext,
+									  ZSTD_c_compressionLevel,
+									  ZSTDCompressor::comp_level));
+	check_zstd(
 		ZSTD_CCtx_setParameter(this->ZSTDCContext, ZSTD_c_checksumFlag, 1));
-	CHECK_ZSTD(ZSTD_CCtx_setParameter(this->ZSTDCContext, ZSTD_c_nbWorkers,
+	check_zstd(ZSTD_CCtx_setParameter(this->ZSTDCContext, ZSTD_c_nbWorkers,
 									  nbThreads));
 
 	/**
@@ -86,7 +82,7 @@ int ZSTDCompressor::compress(std::filesystem::path& path) {
 	 */
 	size_t const to_read = buff_in_size;
 	for (;;) {
-		size_t read = fread(buff_in.get(), 1, to_read, fin.get());
+		const size_t read = fread(buff_in.data(), 1, to_read, fin.get());
 
 		/**
 		 * Select the flush mode.
@@ -96,28 +92,32 @@ int ZSTDCompressor::compress(std::filesystem::path& path) {
 		 * mode is ZSTD_e_end, since it knows it is compressing the
 		 * entire source in one pass.
 		 */
-		int const last_chunk = (read < to_read);
-		ZSTD_EndDirective const mode =
+		const bool last_chunk = (read < to_read);
+		const ZSTD_EndDirective mode =
 			last_chunk ? ZSTD_e_end : ZSTD_e_continue;
 		/**
 		 * Set the input buffer to what we just read.
 		 * We compress until the input buffer is empty, each time
 		 * flushing the output.
 		 */
-		ZSTD_inBuffer input{buff_in.get(), read, 0};
-		int finished;
-		do {
+		ZSTD_inBuffer input{buff_in.data(), read, 0};
+		bool finished = false;
+		size_t written = 0;
+
+		while (!finished) {
 			/**
 			 * Compress into the output buffer and write all of the
 			 * output to the file so we can reuse the buffer next
 			 * iteration.
 			 */
-			ZSTD_outBuffer output{buff_out.get(), buff_out_size, 0};
+			ZSTD_outBuffer output{buff_out.data(), buff_out_size, 0};
 			size_t const remaining =
 				ZSTD_compressStream2(this->ZSTDCContext, &output, &input, mode);
-			CHECK_ZSTD(remaining);
+			check_zstd(remaining);
 
-			fwrite(buff_out.get(), 1, output.pos, fout.get());
+			written = fwrite(buff_out.data(), 1, output.pos, fout.get());
+
+			assert(written >= output.pos);
 			/**
 			 * If we're on the last chunk we're finished when zstd
 			 * returns 0, which means its consumed all the input AND
@@ -126,9 +126,9 @@ int ZSTDCompressor::compress(std::filesystem::path& path) {
 			 */
 			finished =
 				last_chunk ? (remaining == 0) : (input.pos == input.size);
-		} while (!finished);
+		};
 
-		CHECK(input.pos == input.size,
+		check(input.pos == input.size,
 			  "Impossible: zstd only returns 0 when the input is "
 			  "completely consumed!");
 
@@ -140,21 +140,21 @@ int ZSTDCompressor::compress(std::filesystem::path& path) {
 	return 0;
 }
 
-int ZSTDCompressor::decompress(std::filesystem::path& path) {
+auto ZSTDCompressor::decompress(std::filesystem::path& path) -> int {
 	auto outfile{path};
 	outfile.replace_extension(std::filesystem::path("decomp"));
 
-	unique_file_t fin{std::fopen(path.string().c_str(), "rb")};
-	unique_file_t fout{std::fopen(outfile.string().c_str(), "wb")};
+	const unique_file_t fin{std::fopen(path.string().c_str(), "rb")};
+	const unique_file_t fout{std::fopen(outfile.string().c_str(), "wb")};
 
 	/**
 	 * Create IO Buffers
 	 */
 	const size_t buff_in_size = ZSTD_DStreamInSize();
-	auto buff_in = std::make_unique<char[]>(buff_in_size);
+	std::vector<char> buff_in(buff_in_size, ' ');
 
 	const size_t buff_out_size = ZSTD_DStreamOutSize();
-	auto buff_out = std::make_unique<char[]>(buff_out_size);
+	std::vector<char> buff_out(buff_out_size, ' ');
 
 	/** This loop assumes that the input file is one or more concatenated
 	 * zstd streams. This example won't work if there is trailing non-zstd
@@ -163,18 +163,21 @@ int ZSTDCompressor::decompress(std::filesystem::path& path) {
 	 * completed, and doesn't consume input after the frame.
 	 */
 	const size_t to_read = buff_in_size;
-	size_t read = 0, last_ret = 0;
+	size_t read = 0;
+	size_t last_ret = 0;
+	size_t written = 0;
+
 	int is_empty = 1;
-	while ((read = fread(buff_in.get(), 1, to_read, fin.get()))) {
+	while ((read = fread(buff_in.data(), 1, to_read, fin.get())) != 0) {
 		is_empty = 0;
-		ZSTD_inBuffer input{buff_in.get(), read, 0};
+		ZSTD_inBuffer input{buff_in.data(), read, 0};
 		/** Given a valid frame, zstd won't consume the last byte of the
 		 * frame until it has flushed all of the decompressed data of
 		 * the frame. Therefore, instead of checking if the return code
 		 * is 0, we can decompress just check if input.pos < input.size.
 		 */
 		while (input.pos < input.size) {
-			ZSTD_outBuffer output{buff_out.get(), buff_out_size, 0};
+			ZSTD_outBuffer output{buff_out.data(), buff_out_size, 0};
 			/** The return code is zero if the frame is complete,
 			 * but there may be multiple frames concatenated
 			 * together. Zstd will automatically reset the context
@@ -185,15 +188,17 @@ int ZSTDCompressor::decompress(std::filesystem::path& path) {
 			 */
 			const size_t ret =
 				ZSTD_decompressStream(this->ZSTDDContext, &output, &input);
-			CHECK_ZSTD(ret);
+			check_zstd(ret);
 
-			fwrite(buff_out.get(), 1, output.pos, fout.get());
+			written = fwrite(buff_out.data(), 1, output.pos, fout.get());
+
+			assert(written != read);
 
 			last_ret = ret;
 		}
 	}
 
-	if (is_empty) {
+	if (is_empty != 0) {
 		throw std::filesystem::filesystem_error("Input is empty",
 												std::error_code());
 	}
@@ -210,7 +215,7 @@ int ZSTDCompressor::decompress(std::filesystem::path& path) {
 	return 0;
 }
 
-int ZSTDCompressor::compress(std::vector<std::filesystem::path> paths) {
+auto ZSTDCompressor::compress(std::vector<std::filesystem::path> paths) -> int {
 	auto res = 0;
 	for (auto path : paths) {
 		res = compress(path);
@@ -218,7 +223,8 @@ int ZSTDCompressor::compress(std::vector<std::filesystem::path> paths) {
 	return res;
 }
 
-int ZSTDCompressor::decompress(std::vector<std::filesystem::path> paths) {
+auto ZSTDCompressor::decompress(std::vector<std::filesystem::path> paths)
+	-> int {
 	auto res = 0;
 	for (auto path : paths) {
 		res = decompress(path);

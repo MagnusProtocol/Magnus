@@ -7,6 +7,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+find_program(CLANG_TIDY_EXE NAMES "clang-tidy")
+set(CLANG_TIDY_COMMAND "${CLANG_TIDY_EXE}" "-checks=*,-llvmlibc-*,-google-*,-fuchsia-*,-android-*,-altera-*,-abseil-*,-boost-*,-objc-*,-openmp-*,-zircon-*,-misc-include-cleaner")
+
 # GTest
 set(GTEST_GIT_TAG v1.13.0)
 include(FetchContent)
@@ -56,6 +59,7 @@ add_subdirectory(deps/lz4/build/cmake)
 
 # Libmagnus (backend/protocol)
 add_library(magnus ${LIBMAGNUS_SOURCES})
+set_target_properties(magnus PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_COMMAND}")
 
 # Add all the includes
 target_include_directories(magnus PUBLIC

@@ -13,14 +13,14 @@ public:
 	 * @param input: Reference to a string that is to be compressed
 	 * @returns Compressed string
 	 */
-	std::string compress(std::string_view input);
+	auto compress(const std::string_view input) -> std::string;
 
 	/**
 	 * @brief: Decompress a string
 	 * @param input: Reference to a string that is to be decompressed
 	 * @returns Decompressed string
 	 */
-	std::string decompress(std::string_view input);
+	auto decompress(const std::string_view input) -> std::string;
 
 	/**
 	 * @brief: Compresses a file
@@ -28,7 +28,7 @@ public:
 	 * compressed
 	 * @returns Result of the operation (int)
 	 */
-	int compress(std::filesystem::path& path);
+	auto compress(std::filesystem::path& path) -> int;
 
 	/**
 	 * @brief: Decompress a file
@@ -36,7 +36,7 @@ public:
 	 * decompressed
 	 * @returns Result of the operation (int)
 	 */
-	int decompress(std::filesystem::path& path);
+	auto decompress(std::filesystem::path& path) -> int;
 
 	/**
 	 * @brief: Compresses multiple files
@@ -44,7 +44,7 @@ public:
 	 * are to be compressed
 	 * @returns Result of the operation (int)
 	 */
-	int compress(std::vector<std::filesystem::path> paths);
+	auto compress(std::vector<std::filesystem::path> paths) -> int;
 
 	/**
 	 * @brief: Decompresses multiple files
@@ -52,39 +52,31 @@ public:
 	 * are to be decompressed
 	 * @returns Result of the operation (int)
 	 */
-	int decompress(std::vector<std::filesystem::path> paths);
+	auto decompress(std::vector<std::filesystem::path> paths) -> int;
 
 private:
 	static constexpr int comp_level = 4;
 
 	ZSTD_CCtx* ZSTDCContext;
 	ZSTD_DCtx* ZSTDDContext;
+
+	/**
+	 * @ref: https://github.com/facebook/zstd/blob/dev/examples/common.h
+	 */
+	template <typename... Args>
+	inline void check(bool cond, const Args&... args) {
+		if (!cond) {
+			std::fprintf(stderr, "%s:%d CHECK(%d) failed: ", __FILE__, __LINE__,
+						 cond);
+			(std::cerr << ... << args);
+			std::cerr << '\n';
+			std::fprintf(stderr, "\n");
+			std::exit(1);
+		}
+	}
+
+	inline void check_zstd(size_t result) {
+		check(!ZSTD_isError(result),
+			  "Error in Zstd operation: ", ZSTD_getErrorName(result));
+	}
 };
-
-/**
- * @ref: https://github.com/facebook/zstd/blob/dev/examples/common.h
- */
-
-/**! CHECK
- * Check that the condition holds. If it doesn't print a message and die.
- */
-#define CHECK(cond, ...)                                                       \
-	do {                                                                       \
-		if (!(cond)) {                                                         \
-			fprintf(stderr, "%s:%d CHECK(%s) failed: ", __FILE__, __LINE__,    \
-					#cond);                                                    \
-			fprintf(stderr, "" __VA_ARGS__);                                   \
-			fprintf(stderr, "\n");                                             \
-			exit(1);                                                           \
-		}                                                                      \
-	} while (0)
-
-/**! CHECK_ZSTD
- * Check the zstd error code and die if an error occurred after printing a
- * message.
- */
-#define CHECK_ZSTD(fn)                                                         \
-	do {                                                                       \
-		size_t const err = (fn);                                               \
-		CHECK(!ZSTD_isError(err), "%s", ZSTD_getErrorName(err));               \
-	} while (0)

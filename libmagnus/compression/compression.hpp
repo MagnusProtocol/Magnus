@@ -1,7 +1,13 @@
 #pragma once
 
+#include <cassert>
+#include <cstddef>
+#include <cstdio>
 #include <filesystem>
+#include <iostream>
+#include <stdexcept>
 #include <string>
+#include <string_view>
 #include <vector>
 
 class Compressor {
@@ -11,14 +17,14 @@ public:
 	 * @param input: Reference to a string that is to be compressed
 	 * @returns Compressed string
 	 */
-	virtual std::string compress(std::string_view input) = 0;
+	virtual std::string compress(const std::string_view input) = 0;
 
 	/**
 	 * @brief: Decompress a string
 	 * @param input: Reference to a string that is to be decompressed
 	 * @returns Decompressed string
 	 */
-	virtual std::string decompress(std::string_view input) = 0;
+	virtual std::string decompress(const std::string_view input) = 0;
 
 	/**
 	 * @brief: Compresses a file
