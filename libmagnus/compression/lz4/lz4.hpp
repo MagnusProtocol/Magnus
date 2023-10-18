@@ -2,24 +2,33 @@
 
 #include <compression/compression.hpp>
 
-class LZ4Compressor {
+class LZ4Compressor : Compressor {
 public:
-	LZ4Compressor();
-	~LZ4Compressor();
+	LZ4Compressor() = default;
+	~LZ4Compressor() = default;
 
 	/**
 	 * @brief: Compress a string
 	 * @param input: Reference to a string that is to be compressed
 	 * @returns Compressed string
 	 */
-	std::string compress(std::string& input);
+	auto compress(const std::string_view input) -> std::string;
 
 	/**
 	 * @brief: Decompress a string
 	 * @param input: Reference to a string that is to be decompressed
 	 * @returns Decompressed string
 	 */
-	std::string decompress(std::string& input, int src_size);
+	auto decompress(const std::string_view input) -> std::string;
+
+	/**
+	 * @brief: Decompress a string
+	 * @param input: Reference to a string that is to be decompressed
+	 * @param src_size: Size of the input before compression
+	 * @returns Decompressed string
+	 */
+	auto decompress(const std::string_view input, const int src_size)
+		-> std::string;
 
 	/**
 	 * @brief: Compresses a file
@@ -27,7 +36,7 @@ public:
 	 * compressed
 	 * @returns Result of the operation (int)
 	 */
-	int compress(std::filesystem::path& path);
+	auto compress(std::filesystem::path& path) -> int;
 
 	/**
 	 * @brief: Decompress a file
@@ -35,7 +44,7 @@ public:
 	 * decompressed
 	 * @returns Result of the operation (int)
 	 */
-	int decompress(std::filesystem::path& path);
+	auto decompress(std::filesystem::path& path) -> int;
 
 	/**
 	 * @brief: Compresses multiple files
@@ -43,7 +52,7 @@ public:
 	 * are to be compressed
 	 * @returns Result of the operation (int)
 	 */
-	int compress(std::vector<std::filesystem::path> paths);
+	auto compress(const std::vector<std::filesystem::path>& paths) -> int;
 
 	/**
 	 * @brief: Decompresses multiple files
@@ -51,5 +60,5 @@ public:
 	 * are to be decompressed
 	 * @returns Result of the operation (int)
 	 */
-	int decompress(std::vector<std::filesystem::path> paths);
+	auto decompress(const std::vector<std::filesystem::path>& paths) -> int;
 };

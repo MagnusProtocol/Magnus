@@ -215,7 +215,8 @@ auto ZSTDCompressor::decompress(std::filesystem::path& path) -> int {
 	return 0;
 }
 
-auto ZSTDCompressor::compress(std::vector<std::filesystem::path> paths) -> int {
+auto ZSTDCompressor::compress(const std::vector<std::filesystem::path>& paths)
+	-> int {
 	auto res = 0;
 	for (auto path : paths) {
 		res = compress(path);
@@ -223,7 +224,7 @@ auto ZSTDCompressor::compress(std::vector<std::filesystem::path> paths) -> int {
 	return res;
 }
 
-auto ZSTDCompressor::decompress(std::vector<std::filesystem::path> paths)
+auto ZSTDCompressor::decompress(const std::vector<std::filesystem::path>& paths)
 	-> int {
 	auto res = 0;
 	for (auto path : paths) {

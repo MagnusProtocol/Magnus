@@ -48,7 +48,7 @@ public:
 	 * are to be compressed
 	 * @returns Result of the operation (int)
 	 */
-	virtual int compress(std::vector<std::filesystem::path> paths) = 0;
+	virtual int compress(const std::vector<std::filesystem::path>& paths) = 0;
 
 	/**
 	 * @brief: Decompresses multiple files
@@ -56,7 +56,7 @@ public:
 	 * are to be decompressed
 	 * @returns Result of the operation (int)
 	 */
-	virtual int decompress(std::vector<std::filesystem::path> paths) = 0;
+	virtual int decompress(const std::vector<std::filesystem::path>& paths) = 0;
 
 	/**
 	 * @brief: Insertion operator overload for compression

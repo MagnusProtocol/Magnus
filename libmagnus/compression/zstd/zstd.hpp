@@ -44,7 +44,7 @@ public:
 	 * are to be compressed
 	 * @returns Result of the operation (int)
 	 */
-	auto compress(std::vector<std::filesystem::path> paths) -> int;
+	auto compress(const std::vector<std::filesystem::path>& paths) -> int;
 
 	/**
 	 * @brief: Decompresses multiple files
@@ -52,7 +52,7 @@ public:
 	 * are to be decompressed
 	 * @returns Result of the operation (int)
 	 */
-	auto decompress(std::vector<std::filesystem::path> paths) -> int;
+	auto decompress(const std::vector<std::filesystem::path>& paths) -> int;
 
 private:
 	static constexpr int comp_level = 4;
